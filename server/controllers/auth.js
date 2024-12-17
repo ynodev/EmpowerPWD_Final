@@ -33,21 +33,26 @@ export const login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Set cookie options
+    // Set cookie options based on environment
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
-      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : 'localhost'
+      secure: true, // Always use secure in production
+      sameSite: 'none', // Required for cross-site cookies
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/'
     };
 
+    // Set the cookie
     res.cookie('token', token, cookieOptions);
+
+    // Set CORS headers explicitly
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
 
     return res.status(200).json({
       success: true,
       message: 'Login successful',
-      token,
+      token, // Send token in response body
       userId: user._id,
       role: user.role,
       isVerified: user.isVerified
@@ -64,10 +69,12 @@ export const login = async (req, res) => {
 // Logout function
 export const logout = (req, res) => {
   try {
+    // Clear the cookie with the same options used to set it
     res.clearCookie('token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      secure: true,
+      sameSite: 'none',
+      path: '/'
     });
 
     return res.status(200).json({
@@ -76,14 +83,17 @@ export const logout = (req, res) => {
     });
   } catch (error) {
     console.error('Logout error:', error);
-    return res.status(500).json({ success: false, message: 'Logout failed. Please try again.' });
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Logout failed. Please try again.' 
+    });
   }
 };
 
-// Check authentication function
+// Check authentication status
 export const checkAuth = (req, res) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies?.token || req.headers?.authorization?.replace('Bearer ', '');
     
     if (!token) {
       return res.status(401).json({
@@ -98,19 +108,18 @@ export const checkAuth = (req, res) => {
       success: true,
       userId: decoded.userId,
       role: decoded.role,
-      email: decoded.email,
-      isVerified: decoded.isVerified // Include isVerified status in auth check
+      isVerified: decoded.isVerified
     });
   } catch (error) {
     console.error('Auth check error:', error);
     return res.status(401).json({ 
       success: false,
-      message: 'Invalid authentication token' 
+      message: 'Invalid or expired token' 
     });
   }
 };
 
-// Email check function
+// Email availability check
 export const checkEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -128,6 +137,7 @@ export const checkEmail = async (req, res) => {
       message: 'Email is available'
     });
   } catch (error) {
+    console.error('Email check error:', error);
     res.status(500).json({
       success: false,
       message: 'Error checking email'
