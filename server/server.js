@@ -93,7 +93,7 @@ app.use(cookieParser()); // Parse cookies
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://empower-pwd.vercel.app', // Update this to your new frontend URL
+    'https://empower-pwd.vercel.app/', // Update this to your new frontend URL
     'http://localhost:3000'
   ],
   credentials: true,
