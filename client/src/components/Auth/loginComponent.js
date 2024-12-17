@@ -10,6 +10,10 @@ import slide1 from "../../assets/img/slide-1.png";
 import slide2 from "../../assets/img/slide-2.png";
 import slide3 from "../../assets/img/slide-3.png";
 
+// Add axios configuration at the top of the file
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+axios.defaults.withCredentials = true;
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +63,14 @@ const Login = () => {
     setStatus({ type: '', message: '' });
   
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await axios.post('/api/auth/login', { 
+        email, 
+        password 
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (response.data) {
         const { userId, role, isVerified } = response.data;
