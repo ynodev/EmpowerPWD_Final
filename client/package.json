@@ -16,6 +16,7 @@
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.7",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^1.21.0",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -37,6 +38,7 @@
     "recharts": "^2.13.3",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
+    "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.4",
     "web-vitals": "^2.1.4"
   },
