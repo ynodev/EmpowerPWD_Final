@@ -73,13 +73,13 @@ if (!fs.existsSync(localUploadsDir)) {
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'", "https://empwd.vercel.app"],
-      connectSrc: ["'self'", "https://empwd.vercel.app"],
-      frameSrc: ["'self'", "https://empwd.vercel.app"],
+      defaultSrc: ["'self'", "https://empwd.vercel.app/"],
+      connectSrc: ["'self'", "https://empwd.vercel.app/"],
+      frameSrc: ["'self'", "https://empwd.vercel.app/"],
       imgSrc: ["'self'", "data:", "blob:"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      frameAncestors: ["'self'", "https://empwd.vercel.app"]
+      frameAncestors: ["'self'", "https://empwd.vercel.app/"]
     }
   },
   crossOriginEmbedderPolicy: false,
@@ -93,7 +93,7 @@ app.use(cookieParser()); // Parse cookies
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://empower-pwd.vercel.app', 
+    'https://empower-pwd.vercel.app/', 
     'https://empower-pwd.onrender.com', // Add this line
     'http://localhost:3000'
   ],
@@ -104,7 +104,7 @@ app.use(cors({
 
 // Add these headers to all responses
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.get('origin') || 'https://empower-pwd.vercel.app');
+  res.header('Access-Control-Allow-Origin', req.get('origin') || 'https://empower-pwd.vercel.app/');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
