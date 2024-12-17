@@ -27,8 +27,7 @@ export const login = async (req, res) => {
       { 
         userId: user._id,
         role: user.role,
-        email: user.email,
-        isVerified: user.isVerified
+        isVerified: user.isVerified 
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
