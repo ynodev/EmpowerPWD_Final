@@ -121,7 +121,7 @@ const JobSeekerSchedule = () => {
 
       console.log('Fetching interviews for userId:', userId);
 
-      const response = await axios.get(`http://localhost:5001/api/interviews/jobseeker/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/interviews/jobseeker/${userId}`, {
         withCredentials: true
       });
       

@@ -180,7 +180,7 @@ const JobReview = () => {
       if (!logoPath) return null;
       // Remove any leading slashes and construct the full URL
       const cleanPath = logoPath.startsWith('/') ? logoPath.slice(1) : logoPath;
-      return `http://localhost:5001/${cleanPath}`;
+      return `${process.env.REACT_APP_API_URL}${cleanPath}`;
     };
 
     return (

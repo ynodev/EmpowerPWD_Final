@@ -54,10 +54,11 @@ const FileUploadHandler = ({ onFileChange, fileType, acceptedTypes, label }) => 
       formData.append('document', selectedFile);
       formData.append('fileType', fileType);
 
-      const response = await fetch('http://localhost:5001/api/upload', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/upload`, {
         method: 'POST',
         body: formData,
       });
+      
 
       if (!response.ok) {
         throw new Error('Upload failed');
@@ -138,10 +139,11 @@ FileUploadHandler.uploadFile = async (file) => {
   const formData = new FormData();
   formData.append('document', file);
   
-  const response = await fetch('http://localhost:5001/api/upload', {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/api/upload`, {
     method: 'POST',
     body: formData,
   });
+  
 
   if (!response.ok) {
     throw new Error('Upload failed');

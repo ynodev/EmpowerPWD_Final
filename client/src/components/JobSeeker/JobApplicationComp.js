@@ -2148,7 +2148,7 @@ setShowConfirmDialog(false);
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5001/api/seekers/profile', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/seekers/profile`, {
           withCredentials: true
         });
         

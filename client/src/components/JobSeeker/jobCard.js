@@ -131,8 +131,8 @@ const JobCard = ({ job, onOpenDetails }) => {
         <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 border border-gray-100">
           {companyLogo ? (
             <img 
-              src={`http://localhost:5001${companyLogo}`}
-              alt={companyName}
+            src={`${process.env.REACT_APP_API_URL}${companyLogo}`}
+            alt={companyName}
               className="w-full h-full object-cover"
             />
           ) : (

@@ -27,7 +27,7 @@ const Conversation = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/messages/conversation/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/messages/conversation/${userId}`, {
         headers: getAuthHeaders()
       });
       
@@ -63,12 +63,13 @@ const Conversation = () => {
     if (!newMessage.trim()) return;
 
     try {
-      const response = await axios.post('http://localhost:5001/api/messages/send', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/messages/send`, {
         receiverId: userId,
-        message: newMessage.trim()
+        message: newMessage.trim(),
       }, {
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
       });
+      
       
       if (response.data.success) {
         setMessages(prev => [...prev, response.data.data]);

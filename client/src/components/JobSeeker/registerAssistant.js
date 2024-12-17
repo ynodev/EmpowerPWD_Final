@@ -601,7 +601,7 @@ const RegisterAssistant = () => {
     
     try {
       setIsCheckingEmail(true);
-      const response = await axios.post('http://localhost:5001/api/auth/check-email', { email });
+      const response = await axios.post('process.env.REACT_APP_API_URL/api/auth/check-email', { email });
       
       if (response.data.exists) {
         setErrors(prev => ({
@@ -833,7 +833,7 @@ const RegisterAssistant = () => {
     // Then check if email exists
     try {
       setIsCheckingEmail(true);
-      const response = await axios.post('http://localhost:5001/api/auth/check-email', { email });
+      const response = await axios.post('process.env.REACT_APP_API_URL/api/auth/check-email', { email });
       
       if (response.data.exists) {
         setErrors(prev => ({
@@ -1228,7 +1228,7 @@ const RegisterAssistant = () => {
       }
 
       const response = await axios.post(
-        'http://localhost:5001/api/jobseekers/assistant/register',
+        'process.env.REACT_APP_API_URL/api/jobseekers/assistant/register',
         formDataToSend,
         {
           headers: {

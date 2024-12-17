@@ -990,7 +990,8 @@ const removeDocument = (index) => {
       showNotification('loading', 'Creating your account...');
 
       const response = await axios.post(
-        'http://localhost:5001/api/employers/register',
+        `${process.env.REACT_APP_API_URL}/api/employers/register`
+,
         formDataToSend,
         {
           headers: {
@@ -1086,9 +1087,8 @@ const removeDocument = (index) => {
       setIsSendingOtp(true);
       showNotification('loading', 'Resending verification code...');
       
-      const response = await axios.post('http://localhost:5001/api/auth/resend-otp', { 
-        email: formData.email 
-      });
+      console.log(`${process.env.REACT_APP_API_URL}/api/auth/resend-otp`);
+
 
       if (response.data.success) {
         setTimer(60);
@@ -1115,7 +1115,7 @@ const removeDocument = (index) => {
       // Handle email verification (Step 1)
       if (currentStep === 1) {
         setIsSendingOtp(true);
-        const response = await axios.post('http://localhost:5001/api/auth/send-otp', { 
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/send-otp`, { 
           email: formData.email 
         });
 
@@ -1137,7 +1137,7 @@ const removeDocument = (index) => {
         }
 
         setIsSendingOtp(true);
-        const response = await axios.post('http://localhost:5001/api/auth/verify-otp', {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/verify-otp`, {
           email: formData.email,
           otp: otpString
         });
@@ -2486,7 +2486,7 @@ const removeDocument = (index) => {
     // Then check if email exists
     try {
       setIsCheckingEmail(true);
-      const response = await axios.post('http://localhost:5001/api/auth/check-email', { email });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/check-email`, { email });
       
       if (response.data.exists) {
         setErrors(prev => ({

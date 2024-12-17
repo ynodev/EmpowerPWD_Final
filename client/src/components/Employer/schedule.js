@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 
 // Add this near the top of your file
 const api = axios.create({
-  baseURL: 'http://localhost:5001', // Adjust port as needed
+  baseURL: process.env.REACT_APP_API_URL, // Adjust port as needed
   withCredentials: true
 });
 

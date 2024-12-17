@@ -12,7 +12,7 @@ const ProfileHeader = ({ data, onUpdate }) => {
   useEffect(() => {
     console.log('Profile Header Data:', data);
     if (data?.companyInfo?.companyLogo) {
-      console.log('Logo URL:', `http://localhost:5001${data.companyInfo.companyLogo}`);
+      console.log('Logo URL:', `${process.env.REACT_APP_API_URL}${data.companyInfo.companyLogo}`);
     }
   }, [data]);
 
@@ -79,8 +79,8 @@ const ProfileHeader = ({ data, onUpdate }) => {
           <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
             {data?.companyInfo?.companyLogo ? (
               <img 
-                src={`http://localhost:5001${data.companyInfo.companyLogo}`}
-                alt="Company Logo" 
+              src={`${process.env.REACT_APP_API_URL}${data.companyInfo.companyLogo}`}
+              alt="Company Logo" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   console.error('Error loading image:', e);
@@ -246,8 +246,8 @@ const ProfileHeader = ({ data, onUpdate }) => {
                   />
                 ) : data?.companyInfo?.companyLogo ? (
                   <img 
-                    src={`http://localhost:5001${data.companyInfo.companyLogo}`}
-                    alt="Current Logo" 
+                  src={`${process.env.REACT_APP_API_URL}${data.companyInfo.companyLogo}`}
+                  alt="Current Logo" 
                     className="w-full h-full object-cover"
                   />
                 ) : (

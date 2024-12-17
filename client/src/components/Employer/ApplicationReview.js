@@ -104,7 +104,7 @@ const ApplicationReview = () => {
   const handleApplicationStatus = async (status) => {
     setProcessing(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/applications/review/${application._id}/status`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/applications/review/${application._id}/status`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 

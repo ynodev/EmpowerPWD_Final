@@ -55,8 +55,9 @@ const DocumentViewer = ({ document, onClose }) => {
   console.log('Filename:', filename);
   
   // Use different URLs for viewing and downloading
-  const downloadUrl = `http://localhost:5001/uploads/${encodeURIComponent(filename)}`;
-  const viewUrl = `http://localhost:5001/view-pdf/${encodeURIComponent(filename)}`;
+  const downloadUrl = `${process.env.REACT_APP_API_URL}/uploads/${encodeURIComponent(filename)}`;
+  const viewUrl = `${process.env.REACT_APP_API_URL}/view-pdf/${encodeURIComponent(filename)}`;
+  
   
   const isImage = document.mimeType?.startsWith('image/') || 
                  document.contentType?.startsWith('image/');

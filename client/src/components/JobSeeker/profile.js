@@ -162,7 +162,7 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/seekers/profile', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/seekers/profile`, {
         withCredentials: true
       });
       setProfileData(response.data.profile);
@@ -176,7 +176,7 @@ const Profile = () => {
   const handleSubmit = async (section, data) => {
     try {
       const response = await axios.put(
-        `http://localhost:5001/api/seekers/profile/${section}`,
+`${process.env.REACT_APP_API_URL}/api/seekers/profile/${section}`,
         data,
         { withCredentials: true }
       );
@@ -660,7 +660,7 @@ const Profile = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5001/api/seekers/profile/work-experience',
+`${process.env.REACT_APP_API_URL}/api/seekers/profile/work-experience`,
         data,
         { withCredentials: true }
       );
@@ -699,7 +699,7 @@ const Profile = () => {
       };
 
       const response = await axios.post(
-        'http://localhost:5001/api/seekers/profile/education',
+`${process.env.REACT_APP_API_URL}/api/seekers/profile/education`,
         formattedData,
         { withCredentials: true }
       );
@@ -729,7 +729,7 @@ const Profile = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5001/api/seekers/profile/work-experience/${id}`,
+`${process.env.REACT_APP_API_URL}/api/seekers/profile/work-experience/${id}`,
         data,
         { withCredentials: true }
       );
@@ -761,7 +761,7 @@ const Profile = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5001/api/seekers/profile/education/${id}`,
+        `${process.env.REACT_APP_API_URL}/api/seekers/profile/education/${id}`,
         data,
         { withCredentials: true }
       );
@@ -784,7 +784,7 @@ const Profile = () => {
   const handleDeleteWorkExperience = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5001/api/seekers/profile/work-experience/${id}`,
+        `${process.env.REACT_APP_API_URL}/api/seekers/profile/work-experience/${id}`,
         { withCredentials: true }
       );
       
@@ -802,7 +802,7 @@ const Profile = () => {
   const handleDeleteEducation = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5001/api/seekers/profile/education/${id}`,
+        `${process.env.REACT_APP_API_URL}/api/seekers/profile/education/${id}`,
         { withCredentials: true }
       );
       
@@ -1027,7 +1027,7 @@ const Profile = () => {
 
       try {
         const response = await axios.put(
-          `http://localhost:5001/api/seekers/profile/education/${education._id}`,
+          `${process.env.REACT_APP_API_URL}/api/seekers/profile/education/${education._id}`,
           submissionData,
           { withCredentials: true }
         );
@@ -2138,7 +2138,7 @@ const Profile = () => {
     const handleAddSkills = async (skills) => {
       try {
         const response = await axios.put(
-          'http://localhost:5001/api/seekers/profile/skills',
+`${process.env.REACT_APP_API_URL}/api/seekers/profile/skills`,
           { skills },
           { withCredentials: true }
         );
@@ -2218,7 +2218,7 @@ const Profile = () => {
       e.preventDefault();
       try {
         const response = await axios.put(
-          'http://localhost:5001/api/seekers/profile/basic-info',
+`${process.env.REACT_APP_API_URL}/api/seekers/profile/basic-info`,
           { 
             ...profileData.basicInfo,
             aboutMe 
@@ -2297,7 +2297,8 @@ const Profile = () => {
     const handleSave = async () => {
       try {
         const response = await axios.put(
-          'http://localhost:5001/api/seekers/profile/preferences',
+          `${process.env.REACT_APP_API_URL}/api/seekers/profile/preferences`
+,
           formData,
           { withCredentials: true }
         );
@@ -2479,7 +2480,7 @@ const Profile = () => {
     if (window.confirm('Are you sure you want to delete this education record?')) {
       try {
         const response = await axios.delete(
-          `http://localhost:5001/api/seekers/profile/education/${id}`,
+          `${process.env.REACT_APP_API_URL}/api/seekers/profile/education/${id}`,
           { withCredentials: true }
         );
         

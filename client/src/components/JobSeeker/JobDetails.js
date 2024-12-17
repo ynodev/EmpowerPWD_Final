@@ -287,8 +287,8 @@ const JobDetails = ({ job, isOpen, onClose, onApply }) => {
             <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white overflow-hidden border border-gray-100 rounded-xl flex-shrink-0">
               {job?.employer?.companyInfo?.companyLogo ? (
                 <img 
-                  src={`http://localhost:5001${job.employer.companyInfo.companyLogo}`}
-                  alt={job.employer?.companyInfo?.companyName}
+                src={`${process.env.REACT_APP_API_URL}${job.employer.companyInfo.companyLogo}`}
+                alt={job.employer?.companyInfo?.companyName}
                   className="w-full h-full object-cover"
                 />
               ) : (

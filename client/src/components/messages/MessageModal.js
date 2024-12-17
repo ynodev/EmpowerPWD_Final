@@ -30,7 +30,7 @@ const MessageModal = ({ isOpen, onClose, jobseekerId, employerId, jobTitle, comp
         receiverId: jobseekerId || employerId,
         message: message
       }, {
-        baseURL: 'http://localhost:5001',
+        baseURL: process.env.REACT_APP_API_URL,
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'

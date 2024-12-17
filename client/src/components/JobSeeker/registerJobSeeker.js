@@ -707,7 +707,7 @@ const CreateJobSeeker = () => {
     // Then check if email exists
     try {
       setIsCheckingEmail(true);
-      const response = await axios.post('http://localhost:5001/api/auth/check-email', { email });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/check-email`, { email });
       
       if (response.data.exists) {
         setErrors(prev => ({
@@ -1040,10 +1040,9 @@ const CreateJobSeeker = () => {
 
     if (currentStep === 1) {
       try {
-        const checkEmailResponse = await axios.post('http://localhost:5001/api/auth/check-email', {
-          email: formData.email
+        const checkEmailResponse = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/check-email`, {
+          email: formData.email,
         });
-
         if (checkEmailResponse.data.exists) {
           setErrors(prev => ({
             ...prev,
@@ -1205,7 +1204,7 @@ const CreateJobSeeker = () => {
       });
 
       const response = await axios.post(
-        'http://localhost:5001/api/jobseekers/create',
+`${process.env.REACT_APP_API_URL}/api/jobseekers/create`,
         formDataToSend,
         {
           headers: {

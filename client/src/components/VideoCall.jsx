@@ -3,7 +3,7 @@ import DailyIframe from '@daily-co/daily-js';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = process.env.REACT_APP_API_URL;
 
 const VideoCall = () => {
     const [callFrame, setCallFrame] = useState(null);

@@ -26,8 +26,8 @@ const SavedJobs = () => {
 
   const fetchSavedJobs = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/seekers/saved-jobs', {
-        withCredentials: true
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/seekers/saved-jobs`, {
+        withCredentials: true,
       });
       
       // Filter out any null jobs
@@ -42,7 +42,7 @@ const SavedJobs = () => {
 
   const handleUnsaveJob = async (savedJobId) => {
     try {
-      await axios.delete(`http://localhost:5001/api/seekers/saved-jobs/${savedJobId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/seekers/saved-jobs/${savedJobId}`, {
         withCredentials: true
       });
       // Remove the unsaved job from state
