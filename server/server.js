@@ -24,8 +24,7 @@ dotenv.config();
 // Near the top of the file, after dotenv.config()
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'e86e6e32cbe447d82c7b834e56095ca1';
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'AC6ab086be0dccea6f747b6c9662419094';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://empower-pwd.vercel.app';
-
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://empwd.vercel.app';
 // Initialize Twilio client
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
@@ -94,7 +93,7 @@ app.use(cookieParser()); // Parse cookies
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://empower-pwd.vercel.app', 
+    'https://empower-pwd.vercel.app', // Update this to your new frontend URL
     'http://localhost:3000'
   ],
   credentials: true,
@@ -104,7 +103,7 @@ app.use(cors({
 
 // Add these headers to all responses
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
+  res.header('Access-Control-Allow-Origin', 'https://empwd.vercel.app');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
