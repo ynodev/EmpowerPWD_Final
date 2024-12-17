@@ -102,21 +102,32 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors());
-// Add these headers to all responses
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || 'https://empwd.vercel.app');
+  // Dynamically set origin based on request
+  const allowedOrigins = [
+    'https://empwd.vercel.app',
+    'http://localhost:3000'
+  ];
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
-  // Handle OPTIONS requests
+
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
-  
+
   next();
 });
+
+// Add this before your routes
+app.options('*', cors());
 // Serve static files from uploads directory
 app.use('/uploads', express.static(localUploadsDir));
 // Add CORS headers for file access
@@ -224,7 +235,17 @@ app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} request to ${req.url}`);
   next();
 });
-
+app.use((req, res, next) => {
+  console.log('---REQUEST RECEIVED---');
+  console.log('Method:', req.method);
+  console.log('Path:', req.path);
+  console.log('Headers:', {
+    origin: req.headers.origin,
+    'access-control-request-method': req.headers['access-control-request-method'],
+    'access-control-request-headers': req.headers['access-control-request-headers']
+  });
+  next();
+});
 // Update the verifyTwilioRequest middleware
 const verifyTwilioRequest = (req, res, next) => {
   // Skip verification in development
