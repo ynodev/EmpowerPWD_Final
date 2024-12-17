@@ -20,7 +20,7 @@ const BlogsGuest = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`);
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`);
       const data = await response.json();
       
       if (data.success) {
