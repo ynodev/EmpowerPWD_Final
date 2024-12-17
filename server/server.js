@@ -102,16 +102,21 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
+app.options('*', cors());
 // Add these headers to all responses
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.get('origin') || 'https://empower-pwd.vercel.app/');
+  res.header('Access-Control-Allow-Origin', req.headers.origin || 'https://empwd.vercel.app');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle OPTIONS requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
   next();
 });
-
 // Serve static files from uploads directory
 app.use('/uploads', express.static(localUploadsDir));
 // Add CORS headers for file access
