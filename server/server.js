@@ -73,13 +73,13 @@ if (!fs.existsSync(localUploadsDir)) {
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      connectSrc: ["'self'"],
-      frameSrc: ["'self'", "http://localhost:3000"],
+      defaultSrc: ["'self'", "https://empwd.vercel.app"],
+      connectSrc: ["'self'", "https://empwd.vercel.app"],
+      frameSrc: ["'self'", "https://empwd.vercel.app"],
       imgSrc: ["'self'", "data:", "blob:"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      frameAncestors: ["'self'", "http://localhost:3000"]
+      frameAncestors: ["'self'", "https://empwd.vercel.app"]
     }
   },
   crossOriginEmbedderPolicy: false,
@@ -93,7 +93,7 @@ app.use(cookieParser()); // Parse cookies
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://empower-pwd.vercel.app/', // Update this to your new frontend URL
+    'https://empower-pwd.vercel.app', // Update this to your new frontend URL
     'http://localhost:3000'
   ],
   credentials: true,
