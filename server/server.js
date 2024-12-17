@@ -63,7 +63,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Use absolute path resolution for imports and uploads
-const uploadsDir = process.env.UPLOAD_PATH || path.join(process.cwd(), 'uploads');
 
 // Ensure the uploads directory exists
 if (!fs.existsSync(uploadsDir)) {
