@@ -5,7 +5,7 @@
   
   "scripts": {
     "start": "node server.js",
-    
+    "build": "mkdir -p /opt/render/project/src && cp server.js /opt/render/project/src/",
     "dev": "nodemon server.js"
   },
 
