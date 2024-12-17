@@ -93,8 +93,9 @@ app.use(cookieParser()); // Parse cookies
 // CORS configuration
 app.use(cors({
   origin: [
-    'https://empower-pwd.vercel.app/', 
-    'https://empower-pwd.onrender.com', // Add this line
+    'https://empower-pwd.vercel.app', // Remove trailing slash
+    'https://empwd.vercel.app', // Add this if this is your actual frontend URL
+    'https://empower-pwd.onrender.com', 
     'http://localhost:3000'
   ],
   credentials: true,
