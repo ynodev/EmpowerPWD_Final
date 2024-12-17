@@ -1,70 +1,81 @@
-// middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import { User, JobSeeker, Employer, Admin } from '../models/userModel.js';
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    // Check for token in cookies or Authorization header
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    // Check both cookie and Authorization header with improved token extraction
+    const token = req.cookies?.token || req.headers?.authorization?.replace('Bearer ', '');
+    
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required',
+        message: 'Authentication required. No token provided.',
       });
     }
 
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
+    } catch (jwtError) {
+      console.error('JWT Verification Error:', jwtError);
       return res.status(401).json({
         success: false,
-        message: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token',
+        message: jwtError.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token',
       });
     }
 
-    // Fetch user data
+    // Fetch user data with error handling
     const user = await User.findById(decoded.userId);
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'User not found',
+        message: 'User not found or deleted',
       });
     }
 
-    // Attach user data to the request
+    // Attach basic user data to request
     req.user = {
       _id: decoded.userId,
       role: decoded.role,
-      email: decoded.email,
       isVerified: decoded.isVerified,
     };
 
-    // Fetch role-specific data
-    if (user.role === 'jobseeker') {
-      const jobSeekerProfile = await JobSeeker.findOne({ user: user._id })
-        .populate('basicInfo locationInfo disabilityInfo workPreferences');
-      req.user.profile = jobSeekerProfile;
-    } else if (user.role === 'employer') {
-      const employerProfile = await Employer.findOne({ user: user._id })
-        .populate('companyInfo contactPerson pwdSupport');
-      req.user.profile = employerProfile;
-    } else if (user.role === 'admin') {
-      const adminProfile = await Admin.findOne({ user: user._id });
-      req.user.profile = adminProfile;
+    // Fetch role-specific profile data with proper error handling
+    try {
+      switch (user.role) {
+        case 'jobseeker':
+          const jobSeekerProfile = await JobSeeker.findOne({ user: user._id })
+            .populate('basicInfo locationInfo disabilityInfo workPreferences');
+          req.user.profile = jobSeekerProfile;
+          break;
+          
+        case 'employer':
+          const employerProfile = await Employer.findOne({ user: user._id })
+            .populate('companyInfo contactPerson pwdSupport');
+          req.user.profile = employerProfile;
+          break;
+          
+        case 'admin':
+          const adminProfile = await Admin.findOne({ user: user._id });
+          req.user.profile = adminProfile;
+          break;
+      }
+    } catch (profileError) {
+      console.error('Profile fetch error:', profileError);
+      // Continue even if profile fetch fails
     }
 
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
-    return res.status(401).json({
+    console.error('Authentication middleware error:', error);
+    return res.status(500).json({
       success: false,
-      message: 'Invalid or expired authentication',
+      message: 'Internal server error during authentication',
     });
   }
 };
 
-// Middleware to restrict access based on roles
+// Role-based access control middleware
 export const roleMiddleware = (roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -77,13 +88,17 @@ export const roleMiddleware = (roles) => {
   };
 };
 
+// Permission-based access control middleware
 export const permissionMiddleware = (requiredPermission) => {
   return async (req, res, next) => {
     try {
       const admin = await Admin.findOne({ user: req.user._id });
       
       if (!admin) {
-        return res.status(403).json({ message: 'Admin profile not found' });
+        return res.status(403).json({ 
+          success: false,
+          message: 'Admin profile not found' 
+        });
       }
 
       // Super admins bypass permission checks
@@ -91,16 +106,21 @@ export const permissionMiddleware = (requiredPermission) => {
         return next();
       }
 
-      // Check if admin has required permission
+      // Check specific permission
       if (!admin.permissions.includes(requiredPermission)) {
         return res.status(403).json({ 
+          success: false,
           message: 'You do not have permission to perform this action' 
         });
       }
 
       next();
     } catch (error) {
-      res.status(500).json({ message: 'Error checking permissions' });
+      console.error('Permission check error:', error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Error checking permissions' 
+      });
     }
   };
 };
