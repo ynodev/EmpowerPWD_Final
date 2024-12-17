@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: empower-pwd-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://mharkpentinio:mQCe0LL5B3tITYSy@empowerpwd.rtqu6.mongodb.net/?retryWrites=true&w=majority&appName=EmpowerPWD
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        value: U@j9$1nE8pV*6m%qT4gD8#tZ2rJ!kH3
+      - key: FRONTEND_URL
+        value: https://empower-pwd.vercel.app
+      - key: UPLOAD_PATH
+        value: uploads
+      - key: NODE_ENV
+        value: production
