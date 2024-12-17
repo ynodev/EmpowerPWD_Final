@@ -25,6 +25,7 @@ dotenv.config();
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'e86e6e32cbe447d82c7b834e56095ca1';
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'AC6ab086be0dccea6f747b6c9662419094';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://empower-pwd-final.vercel.app';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://empower-pwd.onrender.com';
 // Initialize Twilio client
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
@@ -73,17 +74,18 @@ if (!fs.existsSync(localUploadsDir)) {
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'", FRONTEND_URL],
-      connectSrc: ["'self'", FRONTEND_URL],
-      frameSrc: ["'self'", FRONTEND_URL],
-      imgSrc: ["'self'", "data:", "blob:"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      defaultSrc: ["'self'", FRONTEND_URL, BACKEND_URL],
+      connectSrc: ["'self'", FRONTEND_URL, BACKEND_URL, "https://*.twilio.com"],
+      frameSrc: ["'self'", FRONTEND_URL, BACKEND_URL],
+      imgSrc: ["'self'", "data:", "blob:", FRONTEND_URL, BACKEND_URL],
+      styleSrc: ["'self'", "'unsafe-inline'", FRONTEND_URL],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", FRONTEND_URL],
       frameAncestors: ["'self'", FRONTEND_URL]
     }
   },
   crossOriginEmbedderPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
 })); // Set security HTTP headers
 app.use(compression()); // Compress response bodies
 app.use(express.json()); // Parse JSON request bodies
@@ -92,24 +94,35 @@ app.use(cookieParser()); // Parse cookies
 
 // Update the CORS configuration
 const corsOptions = {
-  origin: FRONTEND_URL,
+  origin: [FRONTEND_URL, 'http://localhost:3000'], // Allow both production and development frontend
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['set-cookie']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-twilio-signature'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
 
 // Update the general headers middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
+  // Allow multiple origins
+  const allowedOrigins = [FRONTEND_URL, 'http://localhost:3000'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-twilio-signature');
+  res.header('Access-Control-Expose-Headers', 'Content-Type, Authorization');
+
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(204).end();
   }
   next();
 });
@@ -417,24 +430,23 @@ app.get('/test-image/:filename', (req, res) => {
 
 // Update the static file serving middleware
 app.use('/uploads', (req, res, next) => {
-  // Remove all security headers that might prevent embedding
+  const allowedOrigins = [FRONTEND_URL, 'http://localhost:3000'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.removeHeader('X-Frame-Options');
   res.removeHeader('Content-Security-Policy');
-  res.removeHeader('X-Content-Security-Policy');
-  res.removeHeader('X-WebKit-CSP');
-  
-  // Set permissive headers
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-  res.header('Content-Security-Policy', "frame-ancestors 'self' http://localhost:3000");
+  res.header('Access-Control-Allow-Credentials', 'true');
   
-  // Set PDF headers
   if (req.url.toLowerCase().endsWith('.pdf')) {
     res.header('Content-Type', 'application/pdf');
     res.header('Content-Disposition', 'inline');
   }
-
   next();
 }, express.static(uploadsDir));
 
@@ -444,13 +456,19 @@ app.get('/api/documents/:filename', (req, res) => {
     const filePath = path.join(uploadsDir, req.params.filename);
     
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'File not found' 
-      });
+      return res.status(404).json({ success: false, message: 'File not found' });
     }
 
-    // Set appropriate headers
+    const allowedOrigins = [FRONTEND_URL, 'http://localhost:3000'];
+    const origin = req.headers.origin;
+    
+    if (allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
+    
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+    
     const ext = path.extname(filePath).toLowerCase();
     if (ext === '.pdf') {
       res.header('Content-Type', 'application/pdf');
@@ -459,22 +477,10 @@ app.get('/api/documents/:filename', (req, res) => {
       res.header('Content-Type', `image/${ext.slice(1)}`);
     }
 
-    // Remove restrictive headers
-    res.removeHeader('X-Frame-Options');
-    res.removeHeader('Content-Security-Policy');
-    
-    // Set CORS headers
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-    
-    // Send the file
     res.sendFile(filePath);
   } catch (error) {
     console.error('Error serving file:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error serving file' 
-    });
+    res.status(500).json({ success: false, message: 'Error serving file' });
   }
 });
 
@@ -577,4 +583,5 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
+
 
