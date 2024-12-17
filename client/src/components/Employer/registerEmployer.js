@@ -1082,24 +1082,27 @@ const removeDocument = (index) => {
 
   const handleResendOTP = async () => {
     if (timer > 0) return;
-    
+  
     try {
       setIsSendingOtp(true);
       showNotification('loading', 'Resending verification code...');
-      
-      console.log(`${process.env.REACT_APP_API_URL}/api/auth/resend-otp`);
-
-
+  
+      // Make API call and store the result in `response`
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/resend-otp`);
+  
+      // Check if the request was successful
       if (response.data.success) {
         setTimer(60);
         showNotification('success', 'Verification code resent successfully!');
       }
     } catch (error) {
+      // Handle API error response
       showNotification('error', error.response?.data?.message || 'Failed to resend verification code');
     } finally {
       setIsSendingOtp(false);
     }
   };
+  
 
   // Update handleNext for OTP verification
   const handleNext = async () => {
@@ -2966,3 +2969,4 @@ const removeDocument = (index) => {
 };
 
 export default EmployerRegistrationForm;
+
