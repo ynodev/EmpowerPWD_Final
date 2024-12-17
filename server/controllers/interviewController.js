@@ -3,8 +3,7 @@ import Application from '../models/jobApplicationModel.js';
 import mongoose from 'mongoose';
 import { JobSeeker, BasicInfo, User } from '../models/userModel.js';
 import { createNotification } from '../models/notification.js';
-import JobApplication from '../models/JobApplication.js';
-import Job from '../models/Job.js';
+import Job from '../models/job.js';
 
 const sendSMS = async (phoneNumber, message) => {
   try {
