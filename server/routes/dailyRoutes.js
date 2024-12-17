@@ -1,6 +1,6 @@
 import express from 'express';
 import { createRoom } from '../controllers/dailyController.js';
-import { authMiddleware } from '../Middleware/authMiddlewareControl.js';
+import { authMiddleware } from '../middleware/authMiddlewareControl.js';
 
 const router = express.Router();
 
