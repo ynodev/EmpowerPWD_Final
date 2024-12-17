@@ -44,9 +44,21 @@ export const getAllBlogs = async (req, res) => {
     }
 };
 
+
 export const createBlog = async (req, res) => {
     try {
         const { title, description, content, type, privacy = 'public' } = req.body;
+
+        // Ensure blog-thumbnails directory exists
+        const thumbnailDir = path.join(process.cwd(), 'uploads', 'blog-thumbnails');
+        if (!fs.existsSync(thumbnailDir)) {
+            fs.mkdirSync(thumbnailDir, { recursive: true });
+        }
+
+        // Construct thumbnail path
+        const thumbnailPath = req.file 
+            ? `/uploads/blog-thumbnails/${req.file.filename}` 
+            : null;
 
         const blog = new Blog({
             title,
@@ -55,35 +67,54 @@ export const createBlog = async (req, res) => {
             type,
             privacy,
             createdBy: req.user._id,
-            thumbnail: req.file ? `/uploads/blog-thumbnails/${req.file.filename}` : null
+            thumbnail: thumbnailPath
         });
 
         await blog.save();
         res.status(201).json(blog);
     } catch (error) {
+        console.error('Blog creation error:', error);
         res.status(400).json({ message: error.message });
     }
 };
 
+
 export const updateBlog = async (req, res) => {
     try {
-        const updates = req.body;
-        if (req.file) {
-            updates.thumbnail = `/uploads/blog-thumbnails/${req.file.filename}`;
-        }
+        const { id } = req.params;
+        const { title, description, content, type, privacy } = req.body;
 
-        const blog = await Blog.findOneAndUpdate(
-            { _id: req.params.id, createdBy: req.user._id },
-            updates,
-            { new: true }
-        );
-
+        // Find the existing blog
+        const blog = await Blog.findById(id);
         if (!blog) {
-            return res.status(404).json({ message: 'Blog not found or unauthorized' });
+            return res.status(404).json({ message: 'Blog not found' });
         }
 
+        // Check if a new thumbnail is uploaded
+        if (req.file) {
+            // Remove old thumbnail if it exists
+            if (blog.thumbnail) {
+                const oldThumbnailPath = path.join(process.cwd(), 'uploads', blog.thumbnail.replace('/uploads/', ''));
+                if (fs.existsSync(oldThumbnailPath)) {
+                    fs.unlinkSync(oldThumbnailPath);
+                }
+            }
+
+            // Update with new thumbnail
+            blog.thumbnail = `/uploads/blog-thumbnails/${req.file.filename}`;
+        }
+
+        // Update other blog fields
+        blog.title = title || blog.title;
+        blog.description = description || blog.description;
+        blog.content = content || blog.content;
+        blog.type = type || blog.type;
+        blog.privacy = privacy || blog.privacy;
+
+        await blog.save();
         res.json(blog);
     } catch (error) {
+        console.error('Blog update error:', error);
         res.status(400).json({ message: error.message });
     }
 };
