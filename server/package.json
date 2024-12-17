@@ -2,15 +2,9 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  
   "scripts": {
-    "start": "node src/server.js",
-    "build": "mkdir -p src && cp server.js src/server.js",
+    "start": "node server.js",
     "dev": "nodemon server.js"
-  },
-
-  "engines": {
-    "node": "22.x"  
   },
   "type": "module",
   "keywords": [],
@@ -47,7 +41,6 @@
     "twilio": "^5.3.6",
     "uuid": "^11.0.2"
   }
-  
 }
 
 
