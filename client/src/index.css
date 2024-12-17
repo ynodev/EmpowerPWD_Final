@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --bg-primary: #ffffff;
+    --text-primary: #000000;
+    --link-color: #0066cc;
+}
+
+/* Base styles */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* High Contrast Mode */
+.high-contrast {
+    --bg-primary: #000000;
+    --text-primary: #ffffff;
+    --link-color: #ffff00;
+}
+
+.high-contrast * {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--text-primary) !important;
+}
+
+.high-contrast a {
+    color: var(--link-color) !important;
+}
+
+.high-contrast button:not(.accessibility-widget button) {
+    background-color: var(--text-primary) !important;
+    color: var(--bg-primary) !important;
+    border: 2px solid var(--text-primary) !important;
+}
+
+/* Dark Mode */
+.dark-mode {
+    --bg-primary: #1a1a1a;
+    --text-primary: #ffffff;
+    --link-color: #66b3ff;
+}
+
+.dark-mode * {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode button:not(.accessibility-widget button) {
+    background-color: #333333 !important;
+    border: 1px solid #444444 !important;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #333333 !important;
+    border-color: #444444 !important;
+}
+
+/* Font size adjustments */
+html {
+    font-size: 16px;
+}
+
+/* Make sure all text elements inherit font size */
+p, h1, h2, h3, h4, h5, h6, span, div, button, a, input, label, select, textarea {
+    font-size: inherit;
+}

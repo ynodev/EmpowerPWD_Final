@@ -1,0 +1,44 @@
+/* High Contrast Mode */
+.high-contrast {
+    background-color: black !important;
+    color: white !important;
+}
+
+.high-contrast * {
+    background-color: black !important;
+    color: white !important;
+    border-color: white !important;
+}
+
+.high-contrast a {
+    color: yellow !important;
+}
+
+.high-contrast button {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid white !important;
+}
+
+/* Dark Mode */
+.dark-mode {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.dark-mode * {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+.dark-mode button {
+    background-color: #333333 !important;
+    border: 1px solid #444444 !important;
+}
+
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #333333 !important;
+    border-color: #444444 !important;
+} 
