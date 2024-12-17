@@ -140,13 +140,13 @@ if (!mongoURI) {
 
 // Enhanced connection options
 const mongooseOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  ssl: true,
+  sslValidate: false, // Temporarily disable strict SSL validation
+  sslCA: null, // Remove any custom CA if present
+  retryWrites: true,
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
-  family: 4,
-  retryWrites: true,
-  connectTimeoutMS: 30000
+  family: 4
 };
 
 // Try alternative URIs if the main one fails
