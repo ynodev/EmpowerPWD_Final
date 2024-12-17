@@ -3,7 +3,7 @@ services:
     name: empower-pwd-backend
     env: node
     buildCommand: npm install && npm run build
-    startCommand: node src/server.js
+    startCommand: npm start
     envVars:
       - key: MONGODB_URI
         value: mongodb+srv://mharkpentinio:mQCe0LL5B3tITYSy@empowerpwd.rtqu6.mongodb.net/?retryWrites=true&w=majority&appName=EmpowerPWD
