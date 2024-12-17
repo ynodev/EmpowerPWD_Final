@@ -4,15 +4,14 @@
   "main": "index.js",
   
   "scripts": {
-  "start": "node src/server.js",
-  "build": "mkdir -p src && cp server.js src/",
-  "dev": "nodemon server.js"
-},
+    "start": "node src/server.js",  
+    "build": "mkdir -p src && cp server.js src/",  
+    "dev": "nodemon src/server.js"  
+  },
 
   "engines": {
-  "node": "22.x"
-},
-  
+    "node": "22.x"  
+  },
   "type": "module",
   "keywords": [],
   "author": "",
