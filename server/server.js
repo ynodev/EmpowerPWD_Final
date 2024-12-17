@@ -25,7 +25,7 @@ dotenv.config();
 // Near the top of the file, after dotenv.config()
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'e86e6e32cbe447d82c7b834e56095ca1';
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'AC6ab086be0dccea6f747b6c9662419094';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://empower-pwd.vercel.app';
 
 // Initialize Twilio client
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
@@ -86,7 +86,10 @@ app.use(cookieParser()); // Parse cookies
 
 // CORS configuration
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: [
+    'https://empower-pwd.vercel.app', 
+    'http://localhost:3000'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -105,12 +108,8 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static(uploadsDir));
 
 // Add CORS headers for file access
-app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-  next();
-});
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 
 // Add these headers specifically for file downloads
 app.use('/uploads', (req, res, next) => {
@@ -146,12 +145,11 @@ if (!mongoURI) {
 const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 10000, // Increased timeout
+  serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 45000,
-  family: 4,  // Force IPv4
+  family: 4,
   retryWrites: true,
-  connectTimeoutMS: 10000,
-  heartbeatFrequencyMS: 2000
+  connectTimeoutMS: 30000
 };
 
 // Try alternative URIs if the main one fails
@@ -544,17 +542,9 @@ app.get('/view-pdf/:path(*)', (req, res) => {
 app.use('/uploads', express.static('uploads'));
 
 // Start the server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
-  
-  // Verify Twilio configuration
-  console.log('Twilio Configuration:', {
-    accountSid: process.env.TWILIO_ACCOUNT_SID ? 'Set' : 'Not Set',
-    authToken: process.env.TWILIO_AUTH_TOKEN ? 'Set' : 'Not Set',
-    phoneNumber: process.env.TWILIO_PHONE_NUMBER ? 'Set' : 'Not Set',
-    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID ? 'Set' : 'Not Set'
-  });
 });
 
 // Add this after your routes
