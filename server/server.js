@@ -24,7 +24,7 @@ dotenv.config();
 // Near the top of the file, after dotenv.config()
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || 'e86e6e32cbe447d82c7b834e56095ca1';
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || 'AC6ab086be0dccea6f747b6c9662419094';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://empwd.vercel.app';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://empower-pwd-final.vercel.app';
 // Initialize Twilio client
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
@@ -73,13 +73,13 @@ if (!fs.existsSync(localUploadsDir)) {
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'", "https://empwd.vercel.app/"],
-      connectSrc: ["'self'", "https://empwd.vercel.app/"],
-      frameSrc: ["'self'", "https://empwd.vercel.app/"],
+      defaultSrc: ["'self'", FRONTEND_URL],
+      connectSrc: ["'self'", FRONTEND_URL],
+      frameSrc: ["'self'", FRONTEND_URL],
       imgSrc: ["'self'", "data:", "blob:"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      frameAncestors: ["'self'", "https://empwd.vercel.app/"]
+      frameAncestors: ["'self'", FRONTEND_URL]
     }
   },
   crossOriginEmbedderPolicy: false,
@@ -92,7 +92,7 @@ app.use(cookieParser()); // Parse cookies
 
 // Update the CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'https://empwd.vercel.app',
+  origin: FRONTEND_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -103,12 +103,11 @@ app.use(cors(corsOptions));
 
 // Update the general headers middleware
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'https://empwd.vercel.app');
+  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -578,3 +577,4 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
+
