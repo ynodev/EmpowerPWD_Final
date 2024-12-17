@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -64,8 +63,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Use absolute path resolution for imports and uploads
-const uploadsDir = path.resolve(__dirname, '..', 'uploads');
+const uploadsDir = process.env.UPLOAD_PATH || path.join(process.cwd(), 'uploads');
 
+// Ensure the uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {
