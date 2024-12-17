@@ -43,13 +43,76 @@ const blogUpload = multer({
     fileFilter: blogFileFilter,
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
+router.get('/public', async (req, res) => {
+  try {
+    const { type, sort, search } = req.query;
+    
+    // Build filter
+    const filter = { privacy: 'public' };
+    if (type && type !== 'all') {
+      filter.type = type;
+    }
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
 
+    // Build sort
+    const sortOptions = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 }
+    };
+
+    const blogs = await Blog.find(filter)
+      .sort(sortOptions[sort] || sortOptions.newest)
+      .select('-content');
+
+    res.json({
+      success: true,
+      blogs
+    });
+  } catch (error) {
+    console.error('Error fetching blogs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching blogs'
+    });
+  }
+});
+router.get('/public/:id', async (req, res) => {
+  try {
+    const blog = await Blog.findOne({ 
+      _id: req.params.id,
+      privacy: 'public'
+    });
+
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Blog not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      blog
+    });
+  } catch (error) {
+    console.error('Error fetching blog details:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching blog details'
+    });
+  }
+});
 // Routes
-router.get('/', getAllBlogs);
+router.get('/', authMiddleware, getAllBlogs);
 router.post('/', authMiddleware, blogUpload.single('thumbnail'), createBlog);
-router.get('/:id', getBlogById);
-router.put('/:id', authMiddleware, blogUpload.single('thumbnail'), updateBlog);
+router.patch('/:id', authMiddleware, blogUpload.single('thumbnail'), updateBlog);
 router.delete('/:id', authMiddleware, deleteBlog);
+router.get('/:id', getBlogById);
 router.patch('/:id/privacy', authMiddleware, updateBlogPrivacy);
 
 export default router;
