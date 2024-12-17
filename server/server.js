@@ -63,11 +63,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Use absolute path resolution for imports and uploads
+const localUploadsDir = process.env.UPLOAD_PATH || path.join(process.cwd(), 'uploads');
 
 // Ensure the uploads directory exists
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+if (!fs.existsSync(localUploadsDir)) {
+  fs.mkdirSync(localUploadsDir, { recursive: true });
 }
+
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -110,21 +112,11 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from uploads directory
-app.use('/uploads', express.static(uploadsDir));
-
+app.use('/uploads', express.static(localUploadsDir));
 // Add CORS headers for file access
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 
 // Add these headers specifically for file downloads
-app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-  res.header('Access-Control-Allow-Methods', 'GET');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-  res.header('Access-Control-Expose-Headers', 'Content-Disposition');
-  next();
-});
 
 app.use('/api/files', uploadRoutes);
 
