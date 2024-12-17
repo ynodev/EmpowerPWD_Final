@@ -23,42 +23,41 @@ export const login = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Incorrect password!' });
     }
 
-    if (!process.env.JWT_SECRET) {
-      throw new Error('JWT secret key is missing');
-    }
-
     const token = jwt.sign(
       { 
         userId: user._id,
         role: user.role,
         email: user.email,
-        isVerified: user.isVerified // Add isVerified status to token
+        isVerified: user.isVerified
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    // Set token in both cookie and response
-    res.cookie('token', token, {
+    // Set cookie options
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : 'localhost'
+    };
+
+    res.cookie('token', token, cookieOptions);
 
     return res.status(200).json({
       success: true,
       message: 'Login successful',
-      token, // Send token in response for localStorage
+      token,
       userId: user._id,
       role: user.role,
-      isVerified: user.isVerified // Send isVerified status in response
+      isVerified: user.isVerified
     });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ 
       success: false,
-      message: error.message === 'JWT secret key is missing' ? 'Server configuration error' : 'Login failed. Please try again.' 
+      message: 'Login failed. Please try again.'
     });
   }
 };
