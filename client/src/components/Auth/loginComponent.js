@@ -11,8 +11,9 @@ import slide2 from "../../assets/img/slide-2.png";
 import slide3 from "../../assets/img/slide-3.png";
 
 // Add axios configuration at the top of the file
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Access-Control-Allow-Credentials'] = true;
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -67,13 +68,14 @@ const Login = () => {
         email, 
         password 
       }, {
+        withCredentials: true,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         }
       });
       
       if (response.data) {
-        const { userId, role, isVerified } = response.data;
+        const { userId, role, isVerified, token } = response.data;
         
         if (!isVerified) {
           setShowModal(true);
@@ -111,6 +113,13 @@ const Login = () => {
           localStorage.removeItem('userRole');
           localStorage.removeItem('isVerified');
           localStorage.removeItem('userId');
+        }
+
+        // Store the token in localStorage
+        if (token) {
+          localStorage.setItem('token', token);
+          // Set token in axios defaults for future requests
+          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
       }
     } catch (error) {
