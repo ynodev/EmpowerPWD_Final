@@ -9,27 +9,22 @@ dotenv.config();
 
 // Login function
 export const login = async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const { email, password } = req.body;
-    
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Incorrect password!' });
     }
 
     const token = jwt.sign(
-      {
+      { 
         userId: user._id,
         role: user.role,
         email: user.email,
@@ -39,31 +34,30 @@ export const login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Set cookie with proper options
-    res.cookie('token', token, {
+    // Updated cookie options for cross-domain
+    const cookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 24 * 60 * 60 * 1000,
-      path: '/'
-    });
+      secure: true, // Always use secure in production
+      sameSite: 'none', // Required for cross-domain
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/',
+    };
 
-    // Also send token in response for localStorage
+    res.cookie('token', token, cookieOptions);
+
     return res.status(200).json({
       success: true,
+      message: 'Login successful',
       token,
-      user: {
-        _id: user._id,
-        role: user.role,
-        email: user.email,
-        isVerified: user.isVerified
-      }
+      userId: user._id,
+      role: user.role,
+      isVerified: user.isVerified
     });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({
+    return res.status(500).json({ 
       success: false,
-      message: 'Login failed'
+      message: 'Login failed. Please try again.'
     });
   }
 };
