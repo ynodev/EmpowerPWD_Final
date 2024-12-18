@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from "../ui/alert";
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import logo from "../../assets/img/logo.svg";
+
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
+
+// Helper function to get cookie
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+};
 
 const AdminLogin = () => {
     const [email, setEmail] = useState(() => {
@@ -15,7 +26,6 @@ const AdminLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(() => {
-        // Check if remember me was previously enabled
         return localStorage.getItem('rememberMe') === 'true';
     });
     const navigate = useNavigate();
@@ -27,55 +37,66 @@ const AdminLogin = () => {
 
         try {
             const response = await axios.post(
-                'https://empower-pwd.onrender.com/api/admin/login', 
+                `${API_BASE_URL}/admin/login`,
                 { email, password },
-                { 
-                    withCredentials: true,
+                {
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    withCredentials: true // Important for cookies
                 }
             );
 
-            if (response.data.success) {
-                console.log('Login response:', response.data);
-                console.log('Cookies after login:', document.cookie);
-                
-                const { user } = response.data;
-                localStorage.setItem('userId', user._id);
-                localStorage.setItem('userRole', user.role);
-
-                if (rememberMe) {
-                    localStorage.setItem('rememberedEmail', email);
-                    localStorage.setItem('rememberMe', 'true');
-                } else {
-                    localStorage.removeItem('rememberedEmail');
-                    localStorage.setItem('rememberMe', 'false');
-                }
-
-                setStatus({
-                    type: 'success',
-                    message: response.data.message || 'Login successful'
-                });
-
-                navigate('/admin/dashboard');
-            } else {
+            if (!response.data.success) {
                 throw new Error(response.data.message || 'Login failed');
             }
-        } catch (error) {
-            console.error('Login error details:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
+
+            // Store non-sensitive data in localStorage
+            localStorage.setItem('userId', response.data.userId);
+            localStorage.setItem('userRole', response.data.role);
+
+            setStatus({
+                type: 'success',
+                message: response.data.message || 'Login successful'
             });
+
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                localStorage.removeItem('rememberedEmail');
+                localStorage.setItem('rememberMe', 'false');
+            }
+
+            setTimeout(() => {
+                navigate('/admin/dashboard');
+            }, 1000);
+
+        } catch (error) {
+            console.error('Login error:', error);
             setStatus({
                 type: 'error',
-                message: error.response?.data?.message || 'Invalid credentials, please try again.'
+                message: error.response?.data?.message || error.message || 'Invalid credentials, please try again.'
             });
+
+            // Clear stored data on error
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userRole');
         } finally {
             setIsLoading(false);
         }
     };
+
+    // Check if already logged in
+    useEffect(() => {
+        const token = getCookie('token'); // Get token from cookie instead
+        const userRole = localStorage.getItem('userRole');
+        
+        if (token && userRole === 'admin') {
+            navigate('/admin/dashboard');
+        }
+    }, [navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white font-poppins">
