@@ -20,16 +20,21 @@ const Blogs = () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
         setBlogs(data.blogs);
       } else {
-        throw new Error(data.message);
+        throw new Error(data.message || 'Failed to fetch blogs');
       }
     } catch (error) {
-      setError('Failed to fetch blogs');
-      console.error('Error:', error);
+      setError(error.message || 'Failed to fetch blogs');
+      console.error('Error fetching blogs:', error);
     } finally {
       setLoading(false);
     }
