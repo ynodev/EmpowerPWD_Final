@@ -106,6 +106,10 @@ const SelectionChips = ({ options, selected, onChange, label }) => {
   );
 };
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
+
 const EditJob = () => {
   const { jobId } = useParams();
   const navigate = useNavigate();
@@ -178,14 +182,26 @@ const EditJob = () => {
         }
 
         // If no session data, fetch from API
-        const response = await fetch(`/api/employer/jobs/${jobId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          credentials: 'include'
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/employer/jobs/${jobId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Accept': 'application/json'
+            },
+            credentials: 'include'
+          }
+        );
+
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          console.error('Received non-JSON response:', text);
+          throw new Error('Server returned non-JSON response');
+        }
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -298,13 +314,27 @@ const EditJob = () => {
         industry: Array.isArray(formData.industry) ? formData.industry : [formData.industry]
       };
 
-      const response = await fetch(`/api/employer/jobs/${jobId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formattedData)
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/employer/jobs/${jobId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formattedData),
+          credentials: 'include'
+        }
+      );
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text);
+        throw new Error('Server returned non-JSON response');
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
