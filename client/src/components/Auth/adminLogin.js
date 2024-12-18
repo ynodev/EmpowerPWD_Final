@@ -42,14 +42,23 @@ const AdminLogin = () => {
                 }
             );
 
+            console.log('Login response:', response.data); // Debug log
+
             if (!response.data.success) {
                 throw new Error(response.data.message || 'Login failed');
             }
 
-            // Store authentication data
-            localStorage.setItem('userId', response.data.userId);
-            localStorage.setItem('userRole', response.data.role);
-            localStorage.setItem('token', response.data.token);
+            // Store authentication data from user object
+            const userData = response.data.user;
+            if (!userData) {
+                throw new Error('No user data received');
+            }
+
+            localStorage.setItem('userId', userData._id);
+            localStorage.setItem('userRole', userData.role);
+            localStorage.setItem('accessLevel', userData.accessLevel);
+            localStorage.setItem('permissions', JSON.stringify(userData.permissions));
+            // The token might be set in cookies automatically due to withCredentials: true
 
             setStatus({
                 type: 'success',
@@ -64,10 +73,12 @@ const AdminLogin = () => {
                 localStorage.setItem('rememberMe', 'false');
             }
 
-            // Short delay to show success message
-            setTimeout(() => {
+            // Navigate immediately after setting localStorage
+            if (userData.role === 'admin') {
                 navigate('/admin/dashboard');
-            }, 1000);
+            } else {
+                throw new Error('Insufficient permissions');
+            }
 
         } catch (error) {
             console.error('Login error:', error);
@@ -77,20 +88,22 @@ const AdminLogin = () => {
             });
 
             // Clear any existing auth data on error
-            localStorage.removeItem('token');
             localStorage.removeItem('userId');
             localStorage.removeItem('userRole');
+            localStorage.removeItem('accessLevel');
+            localStorage.removeItem('permissions');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Add useEffect to check if already logged in
+    // Update the check for logged-in status
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
         const userRole = localStorage.getItem('userRole');
+        const accessLevel = localStorage.getItem('accessLevel');
         
-        if (token && userRole === 'admin') {
+        if (userId && userRole === 'admin' && accessLevel) {
             navigate('/admin/dashboard');
         }
     }, [navigate]);
