@@ -26,45 +26,29 @@ const AdminLogin = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post('https://empower-pwd.onrender.com/api/admin/login', { 
-                email, 
-                password 
+            const response = await axios.post('/api/admin/login', { email, password });
+
+            localStorage.setItem('userId', response.data.userId);
+            localStorage.setItem('userRole', response.data.role);
+
+            setStatus({
+                type: 'success',
+                message: response.data.message || 'Login successful'
             });
 
-            if (response.data.success) {
-                // Store all relevant data in localStorage
-                localStorage.setItem('userId', response.data.userId);
-                localStorage.setItem('userRole', response.data.role);
-                localStorage.setItem('accessLevel', response.data.accessLevel);
-                localStorage.setItem('permissions', JSON.stringify(response.data.permissions));
-
-                if (rememberMe) {
-                    localStorage.setItem('rememberedEmail', email);
-                    localStorage.setItem('rememberMe', 'true');
-                } else {
-                    localStorage.removeItem('rememberedEmail');
-                    localStorage.setItem('rememberMe', 'false');
-                }
-
-                setStatus({
-                    type: 'success',
-                    message: response.data.message || 'Login successful'
-                });
-
-                navigate('/admin/dashboard');
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                localStorage.removeItem('rememberedEmail');
+                localStorage.setItem('rememberMe', 'false');
             }
+
+            navigate('/admin/dashboard');
         } catch (error) {
-            let errorMessage = 'An error occurred during login. Please try again.';
-            
-            if (error.response) {
-                errorMessage = error.response.data.message || errorMessage;
-            } else if (error.request) {
-                errorMessage = 'No response from server. Please check your internet connection.';
-            }
-            
             setStatus({
                 type: 'error',
-                message: errorMessage
+                message: error.response?.data?.message || 'Invalid credentials, please try again.'
             });
             console.error('Login error:', error);
         } finally {
