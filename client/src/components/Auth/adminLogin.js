@@ -42,23 +42,30 @@ const AdminLogin = () => {
                 }
             );
 
-            console.log('Login response:', response.data); // Debug log
+            console.log('Login response:', response.data);
 
             if (!response.data.success) {
                 throw new Error(response.data.message || 'Login failed');
             }
 
-            // Store authentication data from user object
             const userData = response.data.user;
             if (!userData) {
                 throw new Error('No user data received');
+            }
+
+            // Create cookie expiry date (e.g., 7 days from now)
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 7);
+
+            // Set cookie with token if it's provided in the response
+            if (response.data.token) {
+                document.cookie = `adminToken=${response.data.token}; expires=${expiryDate.toUTCString()}; path=/; secure; samesite=strict`;
             }
 
             localStorage.setItem('userId', userData._id);
             localStorage.setItem('userRole', userData.role);
             localStorage.setItem('accessLevel', userData.accessLevel);
             localStorage.setItem('permissions', JSON.stringify(userData.permissions));
-            // The token might be set in cookies automatically due to withCredentials: true
 
             setStatus({
                 type: 'success',
@@ -73,7 +80,6 @@ const AdminLogin = () => {
                 localStorage.setItem('rememberMe', 'false');
             }
 
-            // Navigate immediately after setting localStorage
             if (userData.role === 'admin') {
                 navigate('/admin/dashboard');
             } else {
@@ -92,9 +98,18 @@ const AdminLogin = () => {
             localStorage.removeItem('userRole');
             localStorage.removeItem('accessLevel');
             localStorage.removeItem('permissions');
+            // Clear the auth cookie
+            document.cookie = 'adminToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Add a helper function to check for cookie
+    const getAdminToken = () => {
+        const cookies = document.cookie.split(';');
+        const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('adminToken='));
+        return tokenCookie ? tokenCookie.split('=')[1] : null;
     };
 
     // Update the check for logged-in status
@@ -102,8 +117,9 @@ const AdminLogin = () => {
         const userId = localStorage.getItem('userId');
         const userRole = localStorage.getItem('userRole');
         const accessLevel = localStorage.getItem('accessLevel');
+        const token = getAdminToken();
         
-        if (userId && userRole === 'admin' && accessLevel) {
+        if (userId && userRole === 'admin' && accessLevel && token) {
             navigate('/admin/dashboard');
         }
     }, [navigate]);
