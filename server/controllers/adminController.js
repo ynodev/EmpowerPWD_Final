@@ -129,66 +129,87 @@ export const verifyEmailAndSetPassword = async (req, res) => {
 };
 
 export const loginAdmin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
+        console.log('Login attempt for:', email);
 
-    // Find the user
-    const user = await User.findOne({ email });
-    if (!user || user.role !== 'admin') {
-      return res.status(401).json({ 
-        success: false,
-        message: 'Invalid credentials' 
-      });
+        // Find the user
+        const user = await User.findOne({ email });
+        if (!user || user.role !== 'admin') {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
+        }
+
+        // Verify password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Invalid credentials' 
+            });
+        }
+
+        // Find admin profile
+        const adminProfile = await Admin.findOne({ user: user._id });
+        if (!adminProfile) {
+            return res.status(403).json({
+                success: false,
+                message: 'Admin profile not found'
+            });
+        }
+
+        // Generate token
+        const token = jwt.sign(
+            { 
+                userId: user._id,
+                role: user.role,
+                email: user.email,
+                isVerified: user.isVerified,
+                accessLevel: adminProfile.accessLevel
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
+        // Set cookie with specific options for cross-origin
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'none', // Important for cross-origin requests
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost',
+            path: '/'
+        });
+
+        console.log('Token set in cookie:', token);
+        console.log('Cookie settings:', {
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'none',
+            domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost'
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Login successful',
+            user: {
+                _id: user._id,
+                email: user.email,
+                role: user.role,
+                isVerified: user.isVerified,
+                accessLevel: adminProfile.accessLevel,
+                permissions: adminProfile.permissions
+            }
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
     }
-
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ 
-        success: false,
-        message: 'Invalid credentials' 
-      });
-    }
-
-    // Generate token
-    const token = jwt.sign(
-      { 
-        userId: user._id,
-        role: user.role,
-        email: user.email,
-        isVerified: user.isVerified 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Set cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Changed from 'strict' to 'lax' for cross-site requests
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-
-    console.log('Login successful, token set in cookie');
-
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      user: {
-        _id: user._id,
-        email: user.email,
-        role: user.role
-      }
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
-  }
 };
 
 
