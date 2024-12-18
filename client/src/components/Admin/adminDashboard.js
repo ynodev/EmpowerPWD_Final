@@ -803,8 +803,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-    </div>
-  );
-};
-
-export default AdminDashboard;
+  
