@@ -3,6 +3,10 @@ import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import NavEmployer from '../ui/navEmployer.js';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
+
 const Header = () => {
   return (
     <div className="border-b border-gray-300 font-poppins ">
@@ -444,14 +448,32 @@ const handleRemoveFeature = (featureToRemove) => {
     };
 
     try {
-      const response = await fetch('/api/employer/jobs/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(jobData)
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/employer/jobs/create`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(jobData),
+          credentials: 'include'
+        }
+      );
+
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text);
+        throw new Error('Server returned non-JSON response');
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to create job: ${response.status}`);
+      }
 
       const result = await response.json();
       
@@ -463,7 +485,7 @@ const handleRemoveFeature = (featureToRemove) => {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while creating the job posting');
+      alert(error.message || 'An error occurred while creating the job posting');
     }
   };
 
