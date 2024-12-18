@@ -44,9 +44,11 @@ const AdminLogin = () => {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    withCredentials: true // Important for cookies
+                    withCredentials: true
                 }
             );
+
+            console.log('Login response:', response.data); // Debug log
 
             if (!response.data.success) {
                 throw new Error(response.data.message || 'Login failed');
@@ -69,12 +71,24 @@ const AdminLogin = () => {
                 localStorage.setItem('rememberMe', 'false');
             }
 
-            setTimeout(() => {
+            // Check if we have both cookie and role before navigating
+            const token = getCookie('token');
+            if (token && response.data.role === 'admin') {
                 navigate('/admin/dashboard');
-            }, 1000);
+            } else {
+                throw new Error('Authentication failed - missing token or invalid role');
+            }
 
         } catch (error) {
             console.error('Login error:', error);
+            // Log more details about the error
+            if (error.response) {
+                console.error('Error response:', {
+                    data: error.response.data,
+                    status: error.response.status,
+                    headers: error.response.headers
+                });
+            }
             setStatus({
                 type: 'error',
                 message: error.response?.data?.message || error.message || 'Invalid credentials, please try again.'
@@ -88,13 +102,19 @@ const AdminLogin = () => {
         }
     };
 
-    // Check if already logged in
+    // Update the useEffect to be more thorough in its check
     useEffect(() => {
-        const token = getCookie('token'); // Get token from cookie instead
+        const token = getCookie('token');
         const userRole = localStorage.getItem('userRole');
         
+        // Add debug logs
+        console.log('Checking auth state:', { token: !!token, userRole });
+        
         if (token && userRole === 'admin') {
+            console.log('Auth check passed, navigating to dashboard');
             navigate('/admin/dashboard');
+        } else {
+            console.log('Auth check failed:', { hasToken: !!token, userRole });
         }
     }, [navigate]);
 
