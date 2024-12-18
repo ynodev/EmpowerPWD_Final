@@ -63,59 +63,56 @@ const AdminDashboard = () => {
 
   
   useEffect(() => {
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true
+    // Check if user is authenticated before making requests
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get('https://empower-pwd.onrender.com/api/admin/check-auth', {
+          withCredentials: true
+        });
+        
+        if (!response.data.success) {
+          navigate('/admin/login');
+          return;
+        }
+        
+        // If authenticated, proceed with fetching dashboard data
+        fetchDashboardData();
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        navigate('/admin/login');
+      }
     };
 
-    // Fetch platform statistics
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', config)
-      .then(response => {
-        if (response.data.success) {
-          setStats(response.data.data);
+    const fetchDashboardData = async () => {
+      const config = {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
         }
-      })
-      .catch(error => {
+      };
+
+      try {
+        const [statsRes, trendsRes, pendingJobsRes, pendingUsersRes] = await Promise.all([
+          axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', config),
+          axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', config),
+          axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-jobs', config),
+          axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-users', config)
+        ]);
+
+        if (statsRes.data.success) setStats(statsRes.data.data);
+        if (trendsRes.data.success) setMonthlyTrends(trendsRes.data.data);
+        if (pendingJobsRes.data.success) setPendingJobs(pendingJobsRes.data.data);
+        if (pendingUsersRes.data.success) setPendingUsers(pendingUsersRes.data.data);
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
         if (error.response?.status === 401) {
           navigate('/admin/login');
         }
-        console.error('Error fetching platform statistics:', error);
-      });
-
-    // Fetch monthly trends
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', config)
-      .then(response => {
-        if (response.data.success) {
-          setMonthlyTrends(response.data.data);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching monthly trends:', error);
-      });
-
-    // Fetch pending jobs
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-jobs', config)
-      .then(response => {
-        if (response.data.success) {
-          setPendingJobs(response.data.data);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching pending jobs:', error);
-      });
-
-    // Fetch pending users
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-users', config)
-      .then(response => {
-      if (response.data.success) {
-        setPendingUsers(response.data.data);
       }
-    })
-    .catch(error => {
-      console.error('Error fetching pending users:', error);
-    })
+    };
+
+    checkAuth();
   }, [navigate]);
 
   useEffect(() => {
@@ -803,4 +800,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-  
