@@ -1,18 +1,14 @@
-// middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import { User, JobSeeker, Employer, Admin } from '../models/userModel.js';
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    // Get token from cookie or Authorization header
-    let token = req.cookies.token;
+    // Get token from Authorization header first
+    let token = req.headers.authorization?.split(' ')[1];
     
-    // If no cookie token, check Authorization header
-    if (!token && req.headers.authorization) {
-      const authHeader = req.headers.authorization;
-      if (authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
+    // Fallback to cookie if no header token
+    if (!token) {
+      token = req.cookies.token;
     }
 
     if (!token) {
@@ -23,53 +19,30 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     // Verify token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-      return res.status(401).json({
-        success: false,
-        message: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token'
-      });
-    }
-
-    // Fetch user data
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Fetch user and attach to request
     const user = await User.findById(decoded.userId);
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'User not found',
+        message: 'User not found'
       });
     }
 
-    // Attach user data to the request
     req.user = {
-      _id: decoded.userId,
-      role: decoded.role,
-      email: decoded.email,
-      isVerified: decoded.isVerified,
+      _id: user._id,
+      role: user.role,
+      email: user.email,
+      isVerified: user.isVerified
     };
-
-    // Fetch role-specific data
-    if (user.role === 'jobseeker') {
-      const jobSeekerProfile = await JobSeeker.findOne({ user: user._id })
-        .populate('basicInfo locationInfo disabilityInfo workPreferences');
-      req.user.profile = jobSeekerProfile;
-    } else if (user.role === 'employer') {
-      const employerProfile = await Employer.findOne({ user: user._id })
-        .populate('companyInfo contactPerson pwdSupport');
-      req.user.profile = employerProfile;
-    } else if (user.role === 'admin') {
-      const adminProfile = await Admin.findOne({ user: user._id });
-      req.user.profile = adminProfile;
-    }
 
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
+    console.error('Auth middleware error:', error);
     return res.status(401).json({
       success: false,
-      message: 'Authentication failed'
+      message: 'Invalid or expired token'
     });
   }
 };
