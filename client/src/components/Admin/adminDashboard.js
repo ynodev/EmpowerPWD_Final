@@ -63,35 +63,27 @@ const AdminDashboard = () => {
 
   
   useEffect(() => {
-    // Check if user is authenticated before making requests
-    const checkAuth = async () => {
+    // Get token from cookie (browser will automatically send it)
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true  // Important for sending cookies
+    };
+
+    // Add error handling and logging
+    const fetchData = async () => {
       try {
-        const response = await axios.get('https://empower-pwd.onrender.com/api/admin/check-auth', {
-          withCredentials: true
-        });
-        
-        if (!response.data.success) {
+        // First check if user is authenticated
+        const authResponse = await axios.get('https://empower-pwd.onrender.com/api/auth/check-auth', config);
+        console.log('Auth check response:', authResponse.data);
+
+        if (!authResponse.data.success) {
           navigate('/admin/login');
           return;
         }
-        
-        // If authenticated, proceed with fetching dashboard data
-        fetchDashboardData();
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        navigate('/admin/login');
-      }
-    };
 
-    const fetchDashboardData = async () => {
-      const config = {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-
-      try {
+        // Then fetch all dashboard data
         const [statsRes, trendsRes, pendingJobsRes, pendingUsersRes] = await Promise.all([
           axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', config),
           axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', config),
@@ -105,14 +97,14 @@ const AdminDashboard = () => {
         if (pendingUsersRes.data.success) setPendingUsers(pendingUsersRes.data.data);
 
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error('Dashboard data fetch error:', error.response?.data || error.message);
         if (error.response?.status === 401) {
           navigate('/admin/login');
         }
       }
     };
 
-    checkAuth();
+    fetchData();
   }, [navigate]);
 
   useEffect(() => {
