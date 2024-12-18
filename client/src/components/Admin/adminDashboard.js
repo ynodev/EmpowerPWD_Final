@@ -54,11 +54,11 @@ const convertSvgToPng = async (svgUrl) => {
   });
 };
 
-// Helper function to get cookie
-const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+// Add helper function to get admin token
+const getAdminToken = () => {
+    const cookies = document.cookie.split(';');
+    const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('adminToken='));
+    return tokenCookie ? tokenCookie.split('=')[1] : null;
 };
 
 const AdminDashboard = () => {
@@ -75,9 +75,11 @@ const AdminDashboard = () => {
   
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');
-    const token = getCookie('token');
+    const userId = localStorage.getItem('userId');
+    const accessLevel = localStorage.getItem('accessLevel');
+    const token = getAdminToken();
 
-    if (!userRole || userRole !== 'admin' || !token) {
+    if (!userRole || userRole !== 'admin' || !userId || !accessLevel || !token) {
         navigate('/admin/login');
         return;
     }
@@ -85,8 +87,8 @@ const AdminDashboard = () => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
         withCredentials: true
     };
@@ -113,15 +115,13 @@ const AdminDashboard = () => {
             if (pendingUsersRes.data.success) setPendingUsers(pendingUsersRes.data.data);
 
         } catch (error) {
-            console.error('Dashboard data fetch error:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status
-            });
-            
+            console.error('Dashboard data fetch error:', error);
             if (error.response?.status === 401 || error.response?.status === 403) {
-                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
                 localStorage.removeItem('userRole');
+                localStorage.removeItem('accessLevel');
+                localStorage.removeItem('permissions');
+                document.cookie = 'adminToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                 navigate('/admin/login');
             }
         }
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
   }, [stats, monthlyTrends]);
 
   const updateJobStatus = (jobId, newStatus) => {
-    const token = getCookie('token');
+    const token = localStorage.getItem('token');
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ const AdminDashboard = () => {
 
   const verifyUser = async (userId) => {
     try {
-      const token = getCookie('token');
+      const token = localStorage.getItem('token');
       const config = {
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ const AdminDashboard = () => {
 
   const rejectUser = async (userId) => {
     try {
-      const token = getCookie('token');
+      const token = localStorage.getItem('token');
       const config = {
         headers: {
           'Content-Type': 'application/json',
