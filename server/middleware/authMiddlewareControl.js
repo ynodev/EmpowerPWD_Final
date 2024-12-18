@@ -3,18 +3,14 @@ import { User, JobSeeker, Employer, Admin } from '../models/userModel.js';
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    // Get token from cookie or Authorization header
+    console.log('Auth Middleware - Cookies:', req.cookies);
+    console.log('Auth Middleware - Headers:', req.headers);
+
+    // Get token from cookie
     let token = req.cookies.token;
     
-    // If no cookie token, check Authorization header
-    if (!token && req.headers.authorization) {
-      const authHeader = req.headers.authorization;
-      if (authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-      }
-    }
-
     if (!token) {
+      console.log('No token found in cookies');
       return res.status(401).json({
         success: false,
         message: 'No authentication token found'
@@ -25,7 +21,9 @@ export const authMiddleware = async (req, res, next) => {
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log('Decoded token:', decoded);
     } catch (err) {
+      console.log('Token verification failed:', err.message);
       return res.status(401).json({
         success: false,
         message: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token'
@@ -35,40 +33,29 @@ export const authMiddleware = async (req, res, next) => {
     // Fetch user data
     const user = await User.findById(decoded.userId);
     if (!user) {
+      console.log('User not found for id:', decoded.userId);
       return res.status(401).json({
         success: false,
         message: 'User not found',
       });
     }
 
-    // Attach user data to the request
+    // Attach user data to request
     req.user = {
-      _id: decoded.userId,
-      role: decoded.role,
-      email: decoded.email,
-      isVerified: decoded.isVerified,
+      _id: user._id,
+      role: user.role,
+      email: user.email,
+      isVerified: user.isVerified,
     };
 
-    // Fetch role-specific data
-    if (user.role === 'jobseeker') {
-      const jobSeekerProfile = await JobSeeker.findOne({ user: user._id })
-        .populate('basicInfo locationInfo disabilityInfo workPreferences');
-      req.user.profile = jobSeekerProfile;
-    } else if (user.role === 'employer') {
-      const employerProfile = await Employer.findOne({ user: user._id })
-        .populate('companyInfo contactPerson pwdSupport');
-      req.user.profile = employerProfile;
-    } else if (user.role === 'admin') {
-      const adminProfile = await Admin.findOne({ user: user._id });
-      req.user.profile = adminProfile;
-    }
-
+    console.log('Auth successful for user:', req.user);
     next();
   } catch (error) {
     console.error('Authentication error:', error);
     return res.status(401).json({
       success: false,
-      message: 'Authentication failed'
+      message: 'Authentication failed',
+      error: error.message
     });
   }
 };
@@ -115,4 +102,5 @@ export const permissionMiddleware = (requiredPermission) => {
 };
 
 export default authMiddleware;
+
 
