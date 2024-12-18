@@ -1,28 +1,39 @@
-import axios from 'axios';
+import api, { requests, auth } from './axios';
 
-axios.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        config.withCredentials = true;
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+// Using the requests helper
+const fetchData = async () => {
+  try {
+    const response = await requests.get('/api/some-endpoint');
+    // Handle response
+  } catch (error) {
+    // Handle error
+  }
+};
+
+// Using auth helpers
+const login = async (credentials) => {
+  try {
+    const response = await requests.post('/api/auth/login', credentials);
+    if (response.data.token) {
+      auth.setToken(response.data.token);
     }
-);
+    return response.data;
+  } catch (error) {
+    // Handle error
+  }
+};
 
-axios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
-
-export default axios; 
+// Or using the api instance directly
+const customRequest = async () => {
+  try {
+    const response = await api.get('/api/custom', {
+      // Custom config
+      headers: {
+        'Custom-Header': 'value'
+      }
+    });
+    // Handle response
+  } catch (error) {
+    // Handle error
+  }
+};
