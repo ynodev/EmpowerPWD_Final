@@ -29,16 +29,22 @@ const AdminLogin = () => {
             const response = await axios.post(
                 'https://empower-pwd.onrender.com/api/admin/login', 
                 { email, password },
-                { withCredentials: true }
+                { 
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
             );
 
             if (response.data.success) {
-                // Store user data from response
+                console.log('Login response:', response.data);
+                console.log('Cookies after login:', document.cookie);
+                
                 const { user } = response.data;
                 localStorage.setItem('userId', user._id);
                 localStorage.setItem('userRole', user.role);
 
-                // Handle remember me
                 if (rememberMe) {
                     localStorage.setItem('rememberedEmail', email);
                     localStorage.setItem('rememberMe', 'true');
@@ -57,11 +63,15 @@ const AdminLogin = () => {
                 throw new Error(response.data.message || 'Login failed');
             }
         } catch (error) {
+            console.error('Login error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
             setStatus({
                 type: 'error',
                 message: error.response?.data?.message || 'Invalid credentials, please try again.'
             });
-            console.error('Login error:', error);
         } finally {
             setIsLoading(false);
         }
