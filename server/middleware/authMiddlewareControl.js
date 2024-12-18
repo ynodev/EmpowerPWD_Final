@@ -1,4 +1,3 @@
-// middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import { User, JobSeeker, Employer, Admin } from '../models/userModel.js';
 
@@ -117,7 +116,3 @@ export const permissionMiddleware = (requiredPermission) => {
 
 export default authMiddleware;
 
-  };
-};
-
-export default authMiddleware;
