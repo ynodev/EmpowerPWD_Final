@@ -34,13 +34,13 @@ export const login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Set cookie options
+    // Updated cookie options for cross-domain
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000,
-      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : 'localhost'
+      secure: true, // Always use secure in production
+      sameSite: 'none', // Required for cross-domain
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/',
     };
 
     res.cookie('token', token, cookieOptions);
@@ -67,8 +67,9 @@ export const logout = (req, res) => {
   try {
     res.clearCookie('token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      secure: true,
+      sameSite: 'none',
+      path: '/'
     });
 
     return res.status(200).json({
@@ -135,3 +136,4 @@ export const checkEmail = async (req, res) => {
     });
   }
 };
+
