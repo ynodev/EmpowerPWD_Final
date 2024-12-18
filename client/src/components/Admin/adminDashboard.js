@@ -12,10 +12,6 @@ import empowerPwdLogo from '../../assets/img/logo.svg';
 import { format } from 'date-fns';
 Chart.register(...registerables);
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://empower-pwd.onrender.com/api'
-    : '/api';
-
 // Add this helper function to convert SVG to PNG
 const convertSvgToPng = async (svgUrl) => {
   return new Promise((resolve, reject) => {
@@ -54,13 +50,6 @@ const convertSvgToPng = async (svgUrl) => {
   });
 };
 
-// Add helper function to get admin token
-const getAdminToken = () => {
-    const cookies = document.cookie.split(';');
-    const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('adminToken='));
-    return tokenCookie ? tokenCookie.split('=')[1] : null;
-};
-
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [monthlyTrends, setMonthlyTrends] = useState([]);
@@ -74,60 +63,59 @@ const AdminDashboard = () => {
 
   
   useEffect(() => {
-    const userRole = localStorage.getItem('userRole');
-    const userId = localStorage.getItem('userId');
-    const accessLevel = localStorage.getItem('accessLevel');
-    const token = getAdminToken();
-
-    if (!userRole || userRole !== 'admin' || !userId || !accessLevel || !token) {
-        navigate('/admin/login');
-        return;
-    }
-
+    const token = localStorage.getItem('token');
     const config = {
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        withCredentials: true
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     };
 
-    const fetchData = async () => {
-        try {
-            console.log('Fetching dashboard data with role:', localStorage.getItem('userRole'));
-            
-            const [statsRes, trendsRes, pendingJobsRes, pendingUsersRes] = await Promise.all([
-                axios.get(`${API_BASE_URL}/admin/dashboard/stats`, config),
-                axios.get(`${API_BASE_URL}/admin/dashboard/trends`, config),
-                axios.get(`${API_BASE_URL}/admin/dashboard/pending-jobs`, config),
-                axios.get(`${API_BASE_URL}/admin/dashboard/pending-users`, config)
-            ]);
-
-            console.log('Stats response:', statsRes.data);
-            console.log('Trends response:', trendsRes.data);
-            console.log('Pending jobs response:', pendingJobsRes.data);
-            console.log('Pending users response:', pendingUsersRes.data);
-
-            if (statsRes.data.success) setStats(statsRes.data.data);
-            if (trendsRes.data.success) setMonthlyTrends(trendsRes.data.data);
-            if (pendingJobsRes.data.success) setPendingJobs(pendingJobsRes.data.data);
-            if (pendingUsersRes.data.success) setPendingUsers(pendingUsersRes.data.data);
-
-        } catch (error) {
-            console.error('Dashboard data fetch error:', error);
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userRole');
-                localStorage.removeItem('accessLevel');
-                localStorage.removeItem('permissions');
-                document.cookie = 'adminToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                navigate('/admin/login');
-            }
+    // Fetch platform statistics
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', config)
+      .then(response => {
+        if (response.data.success) {
+          setStats(response.data.data);
         }
-    };
+      })
+      .catch(error => {
+        if (error.response?.status === 401) {
+          navigate('/admin/login');
+        }
+        console.error('Error fetching platform statistics:', error);
+      });
 
-    fetchData();
+    // Fetch monthly trends
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', config)
+      .then(response => {
+        if (response.data.success) {
+          setMonthlyTrends(response.data.data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching monthly trends:', error);
+      });
+
+    // Fetch pending jobs
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-jobs', config)
+      .then(response => {
+        if (response.data.success) {
+          setPendingJobs(response.data.data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching pending jobs:', error);
+      });
+
+    // Fetch pending users
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-users', config)
+      .then(response => {
+      if (response.data.success) {
+        setPendingUsers(response.data.data);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching pending users:', error);
+    })
   }, [navigate]);
 
   useEffect(() => {
@@ -137,21 +125,7 @@ const AdminDashboard = () => {
   }, [stats, monthlyTrends]);
 
   const updateJobStatus = (jobId, newStatus) => {
-    const token = localStorage.getItem('token');
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      },
-      withCredentials: true
-    };
-
-    axios.patch(
-      `${API_BASE_URL}/admin/dashboard/jobs/${jobId}/status`,
-      { status: newStatus },
-      config
-    )
+    axios.patch(`https://empower-pwd.onrender.com/api/admin/dashboard/jobs/${jobId}/status`, { status: newStatus })
       .then(response => {
         if (response.data.success) {
           setPendingJobs(pendingJobs.map(job =>
@@ -161,34 +135,27 @@ const AdminDashboard = () => {
       })
       .catch(error => {
         console.error('Error updating job status:', error);
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userRole');
-          navigate('/admin/login');
-        }
       });
   };
 
   const verifyUser = async (userId) => {
     try {
       const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        },
-        withCredentials: true
-      };
-
       const response = await axios.patch(
-        `${API_BASE_URL}/admin/dashboard/users/${userId}/verify`,
+        `https://empower-pwd.onrender.com/api/admin/dashboard/users/${userId}/verify`,
         { status: 'verified' },
-        config
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
 
       if (response.data.success) {
+        // Update the pendingUsers list by removing the verified user
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
+        
+        // Update the stats
         setStats(prev => ({
           ...prev,
           totalVerifiedUsers: prev.totalVerifiedUsers + 1,
@@ -197,34 +164,28 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error verifying user:', error);
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-        navigate('/admin/login');
-      }
+      // You might want to add error handling UI here
     }
   };
 
   const rejectUser = async (userId) => {
     try {
       const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        },
-        withCredentials: true
-      };
-
       const response = await axios.patch(
-        `${API_BASE_URL}/admin/dashboard/users/${userId}/reject`,
+        `https://empower-pwd.onrender.com/api/admin/dashboard/users/${userId}/reject`,
         { status: 'rejected' },
-        config
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
 
       if (response.data.success) {
+        // Remove the rejected user from the pending list
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
+        
+        // Update the stats if needed
         setStats(prev => ({
           ...prev,
           totalUnverifiedUsers: prev.totalUnverifiedUsers - 1
@@ -232,11 +193,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error rejecting user:', error);
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
-        navigate('/admin/login');
-      }
+      // You might want to add error handling UI here
     }
   };
 
