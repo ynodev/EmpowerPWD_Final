@@ -26,15 +26,8 @@ const AdminLogin = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post('https://empower-pwd.onrender.com/api/admin/login', { 
-                email, 
-                password 
-            });
+            const response = await axios.post('/api/admin/login', { email, password });
 
-            if (response.data.token) {
-                localStorage.setItem('token', response.data.token); // Make sure to store the token
-            }
-            
             localStorage.setItem('userId', response.data.userId);
             localStorage.setItem('userRole', response.data.role);
 
@@ -53,20 +46,9 @@ const AdminLogin = () => {
 
             navigate('/admin/dashboard');
         } catch (error) {
-            let errorMessage = 'An error occurred during login. Please try again.';
-            
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
-                errorMessage = error.response.data.message || errorMessage;
-            } else if (error.request) {
-                // The request was made but no response was received
-                errorMessage = 'No response from server. Please check your internet connection.';
-            }
-            
             setStatus({
                 type: 'error',
-                message: errorMessage
+                message: error.response?.data?.message || 'Invalid credentials, please try again.'
             });
             console.error('Login error:', error);
         } finally {
