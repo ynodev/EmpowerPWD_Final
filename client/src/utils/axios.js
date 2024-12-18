@@ -75,22 +75,15 @@ const requests = {
 const auth = {
   setToken: (token) => {
     localStorage.setItem('token', token);
-    // Also set as cookie with secure options
-    document.cookie = `token=${token}; path=/; secure; samesite=none`;
+    // Cookie is set by the server, no need to set it here
   },
   clearToken: () => {
     localStorage.removeItem('token');
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.vercel.app; secure; samesite=none';
+    // Clear cookie through an API call
+    requests.post('/api/auth/logout');
   },
   getToken: () => {
-    // Try cookie first
-    const cookieToken = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('token='))
-      ?.split('=')[1];
-    
-    // Fallback to localStorage
-    return cookieToken || localStorage.getItem('token');
+    return localStorage.getItem('token');
   }
 };
 
