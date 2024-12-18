@@ -4,22 +4,32 @@ import { User, JobSeeker, Employer, Admin } from '../models/userModel.js';
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    // Check for token in cookies or Authorization header
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    // Get token from cookie or Authorization header
+    let token = req.cookies.token;
+    
+    // If no cookie token, check Authorization header
+    if (!token && req.headers.authorization) {
+      const authHeader = req.headers.authorization;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+    }
+
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required',
+        message: 'No authentication token found'
       });
     }
 
+    // Verify token
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       return res.status(401).json({
         success: false,
-        message: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token',
+        message: err.name === 'TokenExpiredError' ? 'Token expired' : 'Invalid token'
       });
     }
 
@@ -59,7 +69,7 @@ export const authMiddleware = async (req, res, next) => {
     console.error('Authentication error:', error);
     return res.status(401).json({
       success: false,
-      message: 'Invalid or expired authentication',
+      message: 'Authentication failed'
     });
   }
 };
