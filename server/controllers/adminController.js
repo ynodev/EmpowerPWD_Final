@@ -134,57 +134,59 @@ export const loginAdmin = async (req, res) => {
 
     // Find the user
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    if (!user || user.role !== 'admin') {
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid credentials' 
+      });
     }
 
-    // Check if the user is an admin
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Only admins can log in.' });
-    }
-
-    // Verify the password
+    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid credentials' 
+      });
     }
 
-    // Generate a token with userId instead of just id
+    // Generate token
     const token = jwt.sign(
       { 
-        userId: user._id, 
+        userId: user._id,
         role: user.role,
         email: user.email,
         isVerified: user.isVerified 
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1h' }
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
     );
 
-    // Set token as HTTP-only cookie
+    // Set cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      sameSite: 'strict',
-      maxAge: 3600000 // 1 hour in milliseconds
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // Changed from 'strict' to 'lax' for cross-site requests
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
 
-    // Update last login time for admin
-    await Admin.updateOne({ user: user._id }, { lastLogin: Date.now() });
+    console.log('Login successful, token set in cookie');
 
-    // Return success response with user info
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
       message: 'Login successful',
-      userId: user._id,
-      role: user.role
+      user: {
+        _id: user._id,
+        email: user.email,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Server error', 
-      error: error.message 
+      message: 'Server error',
+      error: error.message
     });
   }
 };
