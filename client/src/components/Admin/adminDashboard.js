@@ -60,10 +60,28 @@ const AdminDashboard = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const navigate = useNavigate();
+  const [userRole] = useState(localStorage.getItem('userRole'));
+  const [accessLevel] = useState(localStorage.getItem('accessLevel'));
+  const [permissions] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('permissions')) || [];
+    } catch {
+      return [];
+    }
+  });
 
-  
   useEffect(() => {
+    if (!userRole || userRole !== 'admin') {
+      navigate('/admin/login');
+      return;
+    }
+
     const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/admin/login');
+      return;
+    }
+    
     const config = {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -116,7 +134,7 @@ const AdminDashboard = () => {
     .catch(error => {
       console.error('Error fetching pending users:', error);
     })
-  }, [navigate]);
+  }, [navigate, userRole]);
 
   useEffect(() => {
     if (stats && monthlyTrends?.length >= 2) {
