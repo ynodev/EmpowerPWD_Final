@@ -63,15 +63,15 @@ const AdminDashboard = () => {
 
   
   useEffect(() => {
-    const token = localStorage.getItem('token');
     const config = {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true
     };
 
     // Fetch platform statistics
-    axios.get('/api/admin/dashboard/stats', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', config)
       .then(response => {
         if (response.data.success) {
           setStats(response.data.data);
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
       });
 
     // Fetch monthly trends
-    axios.get('/api/admin/dashboard/trends', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', config)
       .then(response => {
         if (response.data.success) {
           setMonthlyTrends(response.data.data);
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
       });
 
     // Fetch pending jobs
-    axios.get('/api/admin/dashboard/pending-jobs', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-jobs', config)
       .then(response => {
         if (response.data.success) {
           setPendingJobs(response.data.data);
@@ -107,7 +107,7 @@ const AdminDashboard = () => {
       });
 
     // Fetch pending users
-    axios.get('/api/admin/dashboard/pending-users', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-users', config)
       .then(response => {
       if (response.data.success) {
         setPendingUsers(response.data.data);
@@ -125,7 +125,18 @@ const AdminDashboard = () => {
   }, [stats, monthlyTrends]);
 
   const updateJobStatus = (jobId, newStatus) => {
-    axios.patch(`/api/admin/dashboard/jobs/${jobId}/status`, { status: newStatus })
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true
+    };
+
+    axios.patch(
+      `https://empower-pwd.onrender.com/api/admin/dashboard/jobs/${jobId}/status`,
+      { status: newStatus },
+      config
+    )
       .then(response => {
         if (response.data.success) {
           setPendingJobs(pendingJobs.map(job =>
@@ -140,22 +151,21 @@ const AdminDashboard = () => {
 
   const verifyUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      };
+
       const response = await axios.patch(
-        `/api/admin/dashboard/users/${userId}/verify`,
+        `https://empower-pwd.onrender.com/api/admin/dashboard/users/${userId}/verify`,
         { status: 'verified' },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+        config
       );
 
       if (response.data.success) {
-        // Update the pendingUsers list by removing the verified user
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
-        
-        // Update the stats
         setStats(prev => ({
           ...prev,
           totalVerifiedUsers: prev.totalVerifiedUsers + 1,
@@ -164,28 +174,26 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error verifying user:', error);
-      // You might want to add error handling UI here
     }
   };
 
   const rejectUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true
+      };
+
       const response = await axios.patch(
-        `/api/admin/dashboard/users/${userId}/reject`,
+        `https://empower-pwd.onrender.com/api/admin/dashboard/users/${userId}/reject`,
         { status: 'rejected' },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
+        config
       );
 
       if (response.data.success) {
-        // Remove the rejected user from the pending list
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
-        
-        // Update the stats if needed
         setStats(prev => ({
           ...prev,
           totalUnverifiedUsers: prev.totalUnverifiedUsers - 1
@@ -193,7 +201,6 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error rejecting user:', error);
-      // You might want to add error handling UI here
     }
   };
 
@@ -791,6 +798,11 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
     </div>
   );
 };
