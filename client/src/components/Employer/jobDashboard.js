@@ -79,29 +79,26 @@ const ManageJobs = () => {
         throw new Error('User not authenticated');
       }
   
-      // Build query parameters
-      const queryParams = new URLSearchParams({
-        status: selectedStatus !== 'All' ? selectedStatus.toLowerCase() : '',
-        workSetup: filters.workSetup !== 'all' ? filters.workSetup : '',
-        employmentType: filters.employmentType !== 'all' ? filters.employmentType : '',
-        search: searchTerm
-      });
-  
-      
-      const response = await fetch(`/api/employer/jobs/employer/${userId}?${queryParams}`, {
+      const response = await fetch(`/api/employer/jobs/employer/${userId}`, {
         method: 'GET',
-        headers: getAuthHeaders(),
+        headers: {
+          ...getAuthHeaders(),
+          'Accept': 'application/json'
+        },
         credentials: 'include'
       });
   
-      if (response.status === 401) {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('token');
-        navigate('/login');
-        return;
+      // Log the response details for debugging
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+  
+      // Check if the response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Expected JSON response but got ${contentType}`);
       }
-      
-      if (response.status === 401) {  
+  
+      if (response.status === 401) {
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
         navigate('/login');
@@ -120,13 +117,13 @@ const ManageJobs = () => {
   
       setAllJobs(data.data || []);
       setJobs(data.data || []);
-      setJobCounts(data.jobCounts); // Update job counts from server response
+      setJobCounts(data.jobCounts);
       
       const starredSet = new Set(
         (data.data || [])
           .filter(job => job.isStarred)
           .map(job => job._id)
-      );  
+      );
       setStarredJobs(starredSet);
   
     } catch (err) {
@@ -134,8 +131,6 @@ const ManageJobs = () => {
       setError(err.message);
       
       if (err.message === 'User not authenticated') {
-        localStorage.removeItem('userId');
-        localStorage.removeItem('token');
         navigate('/login');
       }
     } finally {
