@@ -3,6 +3,10 @@ import { Search, Filter, ChevronDown } from 'lucide-react';
 import NavSeeker from '../ui/navSeeker';
 import { Link } from 'react-router-dom';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
+
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,15 +26,29 @@ const Blogs = () => {
       setError(null);
       
       const response = await fetch(
-        `/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`,
+        `${API_BASE_URL}/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-          }
+            'Accept': 'application/json'
+          },
         }
       );
       
+      // Debug log
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers.get('content-type'));
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        // If not JSON, get the text and log it
+        const text = await response.text();
+        console.error('Received non-JSON response:', text);
+        throw new Error('Server returned non-JSON response');
+      }
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -38,7 +56,7 @@ const Blogs = () => {
       const data = await response.json();
       
       if (data.success) {
-        setBlogs(data.blogs);
+        setBlogs(data.blogs || []);
       } else {
         throw new Error(data.message || 'Failed to fetch blogs');
       }
