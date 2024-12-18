@@ -4,6 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Alert, AlertDescription } from "../ui/alert.js";
 import NavEmployer from '../ui/navEmployer.js';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
+
 // Add these constants at the top of the file, after the imports
 const EMPLOYMENT_TYPES = [
   'all',
@@ -79,22 +83,26 @@ const ManageJobs = () => {
         throw new Error('User not authenticated');
       }
   
-      const response = await fetch(`/api/employer/jobs/employer/${userId}`, {
-        method: 'GET',
-        headers: {
-          ...getAuthHeaders(),
-          'Accept': 'application/json'
-        },
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/employer/jobs/employer/${userId}`,
+        {
+          method: 'GET',
+          headers: {
+            ...getAuthHeaders(),
+            'Accept': 'application/json'
+          },
+        }
+      );
   
       // Log the response details for debugging
       console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+      console.log('Response headers:', response.headers.get('content-type'));
   
       // Check if the response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Received non-JSON response:', text);
         throw new Error(`Expected JSON response but got ${contentType}`);
       }
   
@@ -212,11 +220,14 @@ const ManageJobs = () => {
         throw new Error('Authentication required');
       }
   
-      const response = await fetch(`/api/employer/jobs/${jobId}/star`, {
-        method: 'PATCH',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ isStarred: newStarStatus })
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/employer/jobs/${jobId}/star`,
+        {
+          method: 'PATCH',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ isStarred: newStarStatus })
+        }
+      );
   
       if (!response.ok) {
         throw new Error('Failed to update star status');
@@ -289,13 +300,16 @@ const ManageJobs = () => {
       const selectedJobIds = Array.from(selectedJobs);
       const userId = localStorage.getItem('userId');
 
-      const response = await fetch('/api/employer/jobs/bulk-delete', {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ 
-          jobIds: selectedJobIds
-        })
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/employer/jobs/bulk-delete`,
+        {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ 
+            jobIds: selectedJobIds
+          })
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -687,11 +701,13 @@ const ManageJobs = () => {
   const handleDeleteConfirm = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/employer/jobs/${jobToDelete._id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include'
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/employer/jobs/${jobToDelete._id}`,
+        {
+          method: 'DELETE',
+          headers: getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
