@@ -12,6 +12,13 @@ import empowerPwdLogo from '../../assets/img/logo.svg';
 import { format } from 'date-fns';
 Chart.register(...registerables);
 
+const axiosConfig = {
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+};
+
 // Add this helper function to convert SVG to PNG
 const convertSvgToPng = async (svgUrl) => {
   return new Promise((resolve, reject) => {
@@ -71,7 +78,7 @@ const AdminDashboard = () => {
     };
 
     // Fetch platform statistics
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', axiosConfig)
       .then(response => {
         if (response.data.success) {
           setStats(response.data.data);
@@ -85,7 +92,7 @@ const AdminDashboard = () => {
       });
 
     // Fetch monthly trends
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/trends', axiosConfig)
       .then(response => {
         if (response.data.success) {
           setMonthlyTrends(response.data.data);
@@ -96,7 +103,7 @@ const AdminDashboard = () => {
       });
 
     // Fetch pending jobs
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-jobs', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-jobs', axiosConfig)
       .then(response => {
         if (response.data.success) {
           setPendingJobs(response.data.data);
@@ -107,7 +114,7 @@ const AdminDashboard = () => {
       });
 
     // Fetch pending users
-    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-users', config)
+    axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/pending-users', axiosConfig)
       .then(response => {
       if (response.data.success) {
         setPendingUsers(response.data.data);
@@ -125,7 +132,7 @@ const AdminDashboard = () => {
   }, [stats, monthlyTrends]);
 
   const updateJobStatus = (jobId, newStatus) => {
-    axios.patch(`https://empower-pwd.onrender.com/api/admin/dashboard/jobs/${jobId}/status`, { status: newStatus })
+    axios.patch(`https://empower-pwd.onrender.com/api/admin/dashboard/jobs/${jobId}/status`, { status: newStatus }, axiosConfig)
       .then(response => {
         if (response.data.success) {
           setPendingJobs(pendingJobs.map(job =>
@@ -148,7 +155,8 @@ const AdminDashboard = () => {
           headers: {
             'Authorization': `Bearer ${token}`
           }
-        }
+        },
+        axiosConfig
       );
 
       if (response.data.success) {
@@ -178,7 +186,8 @@ const AdminDashboard = () => {
           headers: {
             'Authorization': `Bearer ${token}`
           }
-        }
+        },
+        axiosConfig
       );
 
       if (response.data.success) {

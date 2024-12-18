@@ -166,15 +166,17 @@ export const loginAdmin = async (req, res) => {
         permissions: adminDetails.permissions
       }, 
       process.env.JWT_SECRET, 
-      { expiresIn: '1h' }
+      { expiresIn: '24h' }
     );
 
-    // Set token as HTTP-only cookie
+    // Set cookie with proper options
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 3600000
+      secure: process.env.NODE_ENV === 'production', // true in production
+      sameSite: 'lax', // Changed from 'strict' to 'lax'
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      path: '/',
+      domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost'
     });
 
     // Update last login time for admin
@@ -187,7 +189,8 @@ export const loginAdmin = async (req, res) => {
       userId: user._id,
       role: user.role,
       accessLevel: adminDetails.accessLevel,
-      permissions: adminDetails.permissions
+      permissions: adminDetails.permissions,
+      token // Include token in response for localStorage backup
     });
   } catch (error) {
     console.error('Login error:', error);

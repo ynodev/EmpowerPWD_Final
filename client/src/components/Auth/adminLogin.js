@@ -26,25 +26,35 @@ const AdminLogin = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post('/api/admin/login', { email, password });
-
-            localStorage.setItem('userId', response.data.userId);
-            localStorage.setItem('userRole', response.data.role);
-
-            setStatus({
-                type: 'success',
-                message: response.data.message || 'Login successful'
+            const response = await axios.post('/api/admin/login', { email, password }, {
+                withCredentials: true
             });
 
-            if (rememberMe) {
-                localStorage.setItem('rememberedEmail', email);
-                localStorage.setItem('rememberMe', 'true');
-            } else {
-                localStorage.removeItem('rememberedEmail');
-                localStorage.setItem('rememberMe', 'false');
-            }
+            if (response.data.success) {
+                localStorage.setItem('userId', response.data.userId);
+                localStorage.setItem('userRole', response.data.role);
+                localStorage.setItem('token', response.data.token);
 
-            navigate('/admin/dashboard');
+                setStatus({
+                    type: 'success',
+                    message: response.data.message || 'Login successful'
+                });
+
+                if (rememberMe) {
+                    localStorage.setItem('rememberedEmail', email);
+                    localStorage.setItem('rememberMe', 'true');
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                    localStorage.setItem('rememberMe', 'false');
+                }
+
+                navigate('/admin/dashboard');
+            } else {
+                setStatus({
+                    type: 'error',
+                    message: response.data.message || 'Invalid credentials, please try again.'
+                });
+            }
         } catch (error) {
             setStatus({
                 type: 'error',

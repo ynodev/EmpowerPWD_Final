@@ -94,7 +94,7 @@ app.use(cookieParser()); // Parse cookies
 
 // Update the CORS configuration
 const corsOptions = {
-  origin: [FRONTEND_URL, 'http://localhost:3000'],
+  origin: [process.env.FRONTEND_URL, 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -104,6 +104,12 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Add this after cors middleware
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 // Cookie parser configuration
 app.use(cookieParser());
