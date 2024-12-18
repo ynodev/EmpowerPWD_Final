@@ -91,6 +91,7 @@ const ManageJobs = () => {
             ...getAuthHeaders(),
             'Accept': 'application/json'
           },
+          credentials: 'include'
         }
       );
   
@@ -225,7 +226,8 @@ const ManageJobs = () => {
         {
           method: 'PATCH',
           headers: getAuthHeaders(),
-          body: JSON.stringify({ isStarred: newStarStatus })
+          body: JSON.stringify({ isStarred: newStarStatus }),
+          credentials: 'include'
         }
       );
   
@@ -307,7 +309,8 @@ const ManageJobs = () => {
           headers: getAuthHeaders(),
           body: JSON.stringify({ 
             jobIds: selectedJobIds
-          })
+          }),
+          credentials: 'include'
         }
       );
 
@@ -706,6 +709,7 @@ const ManageJobs = () => {
         {
           method: 'DELETE',
           headers: getAuthHeaders(),
+          credentials: 'include'
         }
       );
 
