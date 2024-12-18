@@ -16,6 +16,7 @@ import Blog from './models/Blog.js';
 import blogRoutes from './routes/blogRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import jwt from 'jsonwebtoken';
 
 
 // Load environment variables early
@@ -90,24 +91,61 @@ app.use(helmet({
 app.use(compression()); // Compress response bodies
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
-app.use(cookieParser()); // Parse cookies
+app.use(cookieParser(process.env.COOKIE_SECRET || 'your-secret-key'));
 
 // Update the CORS configuration
 const corsOptions = {
-  origin: [FRONTEND_URL, 'http://localhost:3000'], // Allow both production and development frontend
+  origin: [FRONTEND_URL, 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-twilio-signature'],
-  exposedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
 
+// Update cookie settings middleware
+app.use((req, res, next) => {
+  res.cookie('cookieName', 'cookieValue', {
+    httpOnly: true,
+    secure: true, // Enable for HTTPS
+    sameSite: 'none', // Required for cross-site cookies
+    domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost',
+    path: '/',
+  });
+  next();
+});
+
+// Add authentication verification middleware
+const verifyToken = (req, res, next) => {
+  const token = 
+    req.headers.authorization?.split(' ')[1] || // Bearer token
+    req.cookies.token || // Cookie token
+    req.query.token; // URL token
+
+  if (!token) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Access denied. No token provided.' 
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ 
+      success: false, 
+      message: 'Invalid token.' 
+    });
+  }
+};
+
 // Update the general headers middleware
 app.use((req, res, next) => {
-  // Allow multiple origins
   const allowedOrigins = [FRONTEND_URL, 'http://localhost:3000'];
   const origin = req.headers.origin;
   
@@ -118,9 +156,8 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-twilio-signature');
-  res.header('Access-Control-Expose-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Expose-Headers', 'Content-Type, Authorization, Set-Cookie');
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
@@ -294,15 +331,15 @@ app.use('/api/sms', smsRoutes);
 // Configure routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/employers', employerRoutes);
+app.use('/api/employers', verifyToken, employerRoutes);
 app.use('/api/employer-profile', employerProfileRoutes);
 app.use('/api/jobseekers', jobSeekerRoutes);
 app.use('/api', jobForSeekerRoutes);
 app.use('/api/applications', jobApplicationRoutes);
-app.use('/api/jobs', jobForSeekerRoutes);
+app.use('/api/jobs', verifyToken, jobRoutes);
 app.use('/api/employer/jobs', jobRoutes);
 
-app.use('/api/seekers', seekerProfileRoutes);
+app.use('/api/seekers', verifyToken, seekerProfileRoutes);
 app.use('/api/messages', messageRoute);
 app.use('/api/users', userRoutes);
 app.use('/api/admin/dashboard', adminStatsRoutes);
@@ -357,10 +394,28 @@ app.use((error, req, res, next) => {
   next(error);
 });
 
-// Error handling middleware
+// Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something broke!' });
+  
+  if (err.name === 'UnauthorizedError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid token or no token provided'
+    });
+  }
+  
+  if (err.name === 'TokenExpiredError') {
+    return res.status(401).json({
+      success: false,
+      message: 'Token has expired'
+    });
+  }
+
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error'
+  });
 });
 
 // Test routes for debugging
@@ -582,6 +637,11 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.get('/api/auth/verify', verifyToken, (req, res) => {
+  res.json({
+    success: true,
+    user: req.user
+  });
+});
+
 export default app;
-
-
