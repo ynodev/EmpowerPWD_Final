@@ -26,25 +26,36 @@ const AdminLogin = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post('/api/admin/login', { email, password });
+            const response = await axios.post(
+                'https://empower-pwd.onrender.com/api/admin/login', 
+                { email, password },
+                { withCredentials: true }
+            );
 
-            localStorage.setItem('userId', response.data.userId);
-            localStorage.setItem('userRole', response.data.role);
+            if (response.data.success) {
+                // Store user data from response
+                const { user } = response.data;
+                localStorage.setItem('userId', user._id);
+                localStorage.setItem('userRole', user.role);
 
-            setStatus({
-                type: 'success',
-                message: response.data.message || 'Login successful'
-            });
+                // Handle remember me
+                if (rememberMe) {
+                    localStorage.setItem('rememberedEmail', email);
+                    localStorage.setItem('rememberMe', 'true');
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                    localStorage.setItem('rememberMe', 'false');
+                }
 
-            if (rememberMe) {
-                localStorage.setItem('rememberedEmail', email);
-                localStorage.setItem('rememberMe', 'true');
+                setStatus({
+                    type: 'success',
+                    message: response.data.message || 'Login successful'
+                });
+
+                navigate('/admin/dashboard');
             } else {
-                localStorage.removeItem('rememberedEmail');
-                localStorage.setItem('rememberMe', 'false');
+                throw new Error(response.data.message || 'Login failed');
             }
-
-            navigate('/admin/dashboard');
         } catch (error) {
             setStatus({
                 type: 'error',
