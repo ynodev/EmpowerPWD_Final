@@ -97,25 +97,13 @@ const corsOptions = {
   origin: [FRONTEND_URL, 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Set-Cookie'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-twilio-signature'],
+  exposedHeaders: ['Set-Cookie', 'Authorization'],
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
-
-// Add this before routes
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin === FRONTEND_URL || origin === 'http://localhost:3000') {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
 
 // Update cookie parser configuration
 app.use(cookieParser());
