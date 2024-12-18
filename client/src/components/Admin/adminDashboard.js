@@ -70,13 +70,7 @@ const AdminDashboard = () => {
 
   
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    };
-
+    // Remove token from config since it will be sent via cookies
     // Fetch platform statistics
     axios.get('https://empower-pwd.onrender.com/api/admin/dashboard/stats', axiosConfig)
       .then(response => {
@@ -147,23 +141,14 @@ const AdminDashboard = () => {
 
   const verifyUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.patch(
         `https://empower-pwd.onrender.com/api/admin/dashboard/users/${userId}/verify`,
         { status: 'verified' },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        },
         axiosConfig
       );
 
       if (response.data.success) {
-        // Update the pendingUsers list by removing the verified user
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
-        
-        // Update the stats
         setStats(prev => ({
           ...prev,
           totalVerifiedUsers: prev.totalVerifiedUsers + 1,
@@ -172,29 +157,19 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error verifying user:', error);
-      // You might want to add error handling UI here
     }
   };
 
   const rejectUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await axios.patch(
         `https://empower-pwd.onrender.com/api/admin/dashboard/users/${userId}/reject`,
         { status: 'rejected' },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        },
         axiosConfig
       );
 
       if (response.data.success) {
-        // Remove the rejected user from the pending list
         setPendingUsers(pendingUsers.filter(user => user._id !== userId));
-        
-        // Update the stats if needed
         setStats(prev => ({
           ...prev,
           totalUnverifiedUsers: prev.totalUnverifiedUsers - 1
@@ -202,7 +177,6 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error rejecting user:', error);
-      // You might want to add error handling UI here
     }
   };
 

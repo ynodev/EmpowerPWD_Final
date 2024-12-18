@@ -27,13 +27,15 @@ const AdminLogin = () => {
 
         try {
             const response = await axios.post('/api/admin/login', { email, password }, {
-                withCredentials: true
+                withCredentials: true,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
             if (response.data.success) {
                 localStorage.setItem('userId', response.data.userId);
                 localStorage.setItem('userRole', response.data.role);
-                localStorage.setItem('token', response.data.token);
 
                 setStatus({
                     type: 'success',

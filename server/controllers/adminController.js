@@ -129,77 +129,73 @@ export const verifyEmailAndSetPassword = async (req, res) => {
 };
 
 export const loginAdmin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    // Find the user
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+        // Find the user
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Check if the user is an admin
+        if (user.role !== 'admin') {
+            return res.status(403).json({ message: 'Access denied. Only admins can log in.' });
+        }
+
+        // Verify the password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Get admin details
+        const adminDetails = await Admin.findOne({ user: user._id });
+        if (!adminDetails) {
+            return res.status(403).json({ message: 'Admin account not found' });
+        }
+
+        // Generate token
+        const token = jwt.sign(
+            { 
+                userId: user._id, 
+                role: user.role,
+                email: user.email,
+                isVerified: user.isVerified,
+                accessLevel: adminDetails.accessLevel,
+                permissions: adminDetails.permissions
+            }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '24h' }
+        );
+
+        // Set cookie with proper options
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000, // 24 hours
+            path: '/',
+            domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
+        });
+
+        // Return success response without sending token in body
+        return res.status(200).json({ 
+            success: true,
+            message: 'Login successful',
+            userId: user._id,
+            role: user.role,
+            accessLevel: adminDetails.accessLevel,
+            permissions: adminDetails.permissions
+        });
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ 
+            success: false,
+            message: 'Server error', 
+            error: error.message 
+        });
     }
-
-    // Check if the user is an admin
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Only admins can log in.' });
-    }
-
-    // Verify the password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
-    }
-
-    // Get admin details
-    const adminDetails = await Admin.findOne({ user: user._id });
-    if (!adminDetails) {
-      return res.status(403).json({ message: 'Admin account not found' });
-    }
-
-    // Generate a token with additional admin info
-    const token = jwt.sign(
-      { 
-        userId: user._id, 
-        role: user.role,
-        email: user.email,
-        isVerified: user.isVerified,
-        accessLevel: adminDetails.accessLevel,
-        permissions: adminDetails.permissions
-      }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '24h' }
-    );
-
-    // Set cookie with proper options
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true in production
-      sameSite: 'lax', // Changed from 'strict' to 'lax'
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      path: '/',
-      domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost'
-    });
-
-    // Update last login time for admin
-    await Admin.updateOne({ user: user._id }, { lastLogin: Date.now() });
-
-    // Return success response with user info
-    return res.status(200).json({ 
-      success: true,
-      message: 'Login successful',
-      userId: user._id,
-      role: user.role,
-      accessLevel: adminDetails.accessLevel,
-      permissions: adminDetails.permissions,
-      token // Include token in response for localStorage backup
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({ 
-      success: false,
-      message: 'Server error', 
-      error: error.message 
-    });
-  }
 };
 
 
