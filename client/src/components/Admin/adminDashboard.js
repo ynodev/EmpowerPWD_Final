@@ -12,6 +12,10 @@ import empowerPwdLogo from '../../assets/img/logo.svg';
 import { format } from 'date-fns';
 Chart.register(...registerables);
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
+
 // Add this helper function to convert SVG to PNG
 const convertSvgToPng = async (svgUrl) => {
   return new Promise((resolve, reject) => {
@@ -83,10 +87,6 @@ const AdminDashboard = () => {
         },
         withCredentials: true
     };
-
-    const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://empower-pwd.onrender.com/api'
-        : '/api';
 
     const fetchData = async () => {
         try {
