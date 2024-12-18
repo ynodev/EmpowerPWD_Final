@@ -579,4 +579,61 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Add this error handling middleware before your routes
+app.use((req, res, next) => {
+  res.jsonResponse = (data) => {
+    res.setHeader('Content-Type', 'application/json');
+    return res.json(data);
+  };
+  next();
+});
+
+// Update the general error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  
+  // Ensure we're sending JSON response
+  res.setHeader('Content-Type', 'application/json');
+  
+  // Handle specific error types
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid JSON payload',
+      error: err.message
+    });
+  }
+
+  // Default error response
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
+// Add validation middleware for JSON responses
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  res.json = function(data) {
+    if (typeof data === 'undefined') {
+      console.error('Attempting to send undefined JSON response');
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error: undefined response'
+      });
+    }
+    return originalJson.call(this, data);
+  };
+  next();
+});
+
+// Update the 404 handler to ensure JSON response
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`
+  });
+});
+
 export default app;
