@@ -90,7 +90,7 @@ app.use(helmet({
 app.use(compression()); // Compress response bodies
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
-app.use(cookieParser(process.env.COOKIE_SECRET || 'your-secret-key'));
+app.use(cookieParser()); // Parse cookies
 
 // Update the CORS configuration
 const corsOptions = {
@@ -98,50 +98,21 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-twilio-signature'],
-  exposedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
+  exposedHeaders: ['Set-Cookie', 'Authorization'],
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
 
-// Update cookie settings middleware
-app.use((req, res, next) => {
-  res.cookie = res.cookie.bind(res);
-  const originalCookie = res.cookie;
-  res.cookie = function (name, value, options = {}) {
-    const updatedOptions = {
-      ...options,
-      sameSite: 'none',
-      secure: true,
-      httpOnly: true,
-      domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost',
-      path: '/',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    };
-    return originalCookie.call(this, name, value, updatedOptions);
-  };
-  next();
-});
+// Update cookie parser configuration
+app.use(cookieParser());
 
-// Add this middleware to handle authentication token
-app.use((req, res, next) => {
-  // Get token from cookies, headers, or query parameters
-  const token = 
-    req.cookies.token || 
-    (req.headers.authorization && req.headers.authorization.split(' ')[1]) ||
-    req.query.token;
+// Add this middleware to handle preflight requests
+app.options('*', cors(corsOptions));
 
-  if (token) {
-    // Attach token to request for later use
-    req.token = token;
-  }
-  next();
-});
-
-// Update the general headers middleware
+// Update general headers middleware
 app.use((req, res, next) => {
-  // Allow multiple origins
   const allowedOrigins = [FRONTEND_URL, 'http://localhost:3000'];
   const origin = req.headers.origin;
   
@@ -151,18 +122,15 @@ app.use((req, res, next) => {
   
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-twilio-signature');
-  res.header('Access-Control-Expose-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Expose-Headers', 'Set-Cookie, Authorization');
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
   }
   next();
 });
 
-// Add this before your routes
-app.options('*', cors());
 // Serve static files from uploads directory
 app.use('/uploads', express.static(localUploadsDir));
 // Add CORS headers for file access
