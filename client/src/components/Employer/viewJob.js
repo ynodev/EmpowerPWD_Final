@@ -4,6 +4,9 @@ import { Star, ArrowLeft, Users, Clock, Briefcase, BarChart, Eye, MousePointer, 
 import { Card, CardContent } from "../ui/card.js";
 import NavEmployer from "../ui/navEmployer.js";
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://empower-pwd.onrender.com/api'
+    : '/api';
 
 const ViewJob = () => {
   const { jobId } = useParams();
@@ -29,14 +32,25 @@ const ViewJob = () => {
         setLoading(true);
         setError(null);
         
-        const response = await fetch(`/api/employer/jobs/${jobId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          credentials: 'include'
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/employer/jobs/${jobId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Accept': 'application/json'
+            },
+            credentials: 'include'
+          }
+        );
+
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          console.error('Received non-JSON response:', text);
+          throw new Error('Server returned non-JSON response');
+        }
 
         const data = await response.json();
         console.log('Server response:', data);
@@ -408,3 +422,4 @@ const ViewJob = () => {
 };
 
 export default ViewJob;
+
