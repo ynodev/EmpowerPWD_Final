@@ -5,20 +5,12 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import logo from "../../assets/img/logo.svg";
 
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://empower-pwd.onrender.com/api'
-    : '/api';
-
-// Helper function to get cookie
-const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-};
+// Add axios configuration
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+axios.defaults.withCredentials = true;
 
 const AdminLogin = () => {
     const [email, setEmail] = useState(() => {
-        // Check if there's a remembered email on component mount
         return localStorage.getItem('rememberedEmail') || '';
     });
     const [password, setPassword] = useState('');
@@ -36,85 +28,59 @@ const AdminLogin = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post(
-                `${API_BASE_URL}/admin/login`,
-                { email, password },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    withCredentials: true
+            const response = await axios.post('/api/admin/login', { 
+                email, 
+                password 
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            );
-
-            console.log('Login response:', response.data); // Debug log
-
-            if (!response.data.success) {
-                throw new Error(response.data.message || 'Login failed');
-            }
-
-            // Store non-sensitive data in localStorage
-            localStorage.setItem('userId', response.data.userId);
-            localStorage.setItem('userRole', response.data.role);
-
-            setStatus({
-                type: 'success',
-                message: response.data.message || 'Login successful'
             });
 
-            if (rememberMe) {
-                localStorage.setItem('rememberedEmail', email);
-                localStorage.setItem('rememberMe', 'true');
-            } else {
-                localStorage.removeItem('rememberedEmail');
-                localStorage.setItem('rememberMe', 'false');
-            }
+            if (response.data) {
+                const { userId, role } = response.data;
 
-            // Check if we have both cookie and role before navigating
-            const token = getCookie('token');
-            if (token && response.data.role === 'admin') {
-                navigate('/admin/dashboard');
-            } else {
-                throw new Error('Authentication failed - missing token or invalid role');
-            }
+                // Handle remember me
+                if (rememberMe) {
+                    localStorage.setItem('rememberedEmail', email);
+                } else {
+                    localStorage.removeItem('rememberedEmail');
+                }
 
+                setStatus({
+                    type: 'success',
+                    message: response.data.message || 'Login successful'
+                });
+
+                if (role === 'admin') {
+                    localStorage.setItem('userRole', role);
+                    localStorage.setItem('userId', userId);
+                    navigate('/admin/dashboard');
+                } else {
+                    setStatus({
+                        type: 'error',
+                        message: 'Unauthorized access'
+                    });
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('userId');
+                }
+            }
         } catch (error) {
             console.error('Login error:', error);
-            // Log more details about the error
-            if (error.response) {
-                console.error('Error response:', {
-                    data: error.response.data,
-                    status: error.response.status,
-                    headers: error.response.headers
-                });
-            }
             setStatus({
                 type: 'error',
-                message: error.response?.data?.message || error.message || 'Invalid credentials, please try again.'
+                message: error.response?.data?.message || 'An error occurred. Please try again later.'
             });
-
-            // Clear stored data on error
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userRole');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Update the useEffect to be more thorough in its check
     useEffect(() => {
-        const token = getCookie('token');
-        const userRole = localStorage.getItem('userRole');
-        
-        // Add debug logs
-        console.log('Checking auth state:', { token: !!token, userRole });
-        
-        if (token && userRole === 'admin') {
-            console.log('Auth check passed, navigating to dashboard');
-            navigate('/admin/dashboard');
-        } else {
-            console.log('Auth check failed:', { hasToken: !!token, userRole });
+        const savedEmail = localStorage.getItem('rememberedEmail');
+        if (savedEmail) {
+            setEmail(savedEmail);
+            setRememberMe(true);
         }
     }, [navigate]);
 
