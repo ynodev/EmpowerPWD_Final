@@ -14,12 +14,22 @@ const Blogs = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [selectedType, sortBy]);
+  }, [selectedType, sortBy, searchQuery]);
 
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`);
+      setError(null);
+      
+      const response = await fetch(
+        `/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,11 +49,6 @@ const Blogs = () => {
       setLoading(false);
     }
   };
-
-  const filterBlogs = blogs.filter(blog => 
-    blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    blog.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const BlogCard = ({ blog }) => (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
@@ -157,13 +162,13 @@ const Blogs = () => {
           <div className="text-center py-12">
             <p className="text-red-500">{error}</p>
           </div>
-        ) : filterBlogs.length === 0 ? (
+        ) : blogs.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500">No blogs found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filterBlogs.map((blog) => (
+            {blogs.map((blog) => (
               <BlogCard key={blog._id} blog={blog} />
             ))}
           </div>
