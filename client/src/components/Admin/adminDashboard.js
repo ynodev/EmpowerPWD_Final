@@ -54,6 +54,13 @@ const convertSvgToPng = async (svgUrl) => {
   });
 };
 
+// Helper function to get cookie
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+};
+
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [monthlyTrends, setMonthlyTrends] = useState([]);
@@ -68,13 +75,9 @@ const AdminDashboard = () => {
   
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');
-    if (!userRole || userRole !== 'admin') {
-        navigate('/admin/login');
-        return;
-    }
+    const token = getCookie('token');
 
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!userRole || userRole !== 'admin' || !token) {
         navigate('/admin/login');
         return;
     }
@@ -134,7 +137,7 @@ const AdminDashboard = () => {
   }, [stats, monthlyTrends]);
 
   const updateJobStatus = (jobId, newStatus) => {
-    const token = localStorage.getItem('token');
+    const token = getCookie('token');
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -168,7 +171,7 @@ const AdminDashboard = () => {
 
   const verifyUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getCookie('token');
       const config = {
         headers: {
           'Content-Type': 'application/json',
@@ -204,7 +207,7 @@ const AdminDashboard = () => {
 
   const rejectUser = async (userId) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = getCookie('token');
       const config = {
         headers: {
           'Content-Type': 'application/json',
