@@ -149,13 +149,21 @@ export const loginAdmin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate a token with userId instead of just id
+    // Get admin details
+    const adminDetails = await Admin.findOne({ user: user._id });
+    if (!adminDetails) {
+      return res.status(403).json({ message: 'Admin account not found' });
+    }
+
+    // Generate a token with additional admin info
     const token = jwt.sign(
       { 
         userId: user._id, 
         role: user.role,
         email: user.email,
-        isVerified: user.isVerified 
+        isVerified: user.isVerified,
+        accessLevel: adminDetails.accessLevel,
+        permissions: adminDetails.permissions
       }, 
       process.env.JWT_SECRET, 
       { expiresIn: '1h' }
@@ -164,9 +172,9 @@ export const loginAdmin = async (req, res) => {
     // Set token as HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 3600000 // 1 hour in milliseconds
+      maxAge: 3600000
     });
 
     // Update last login time for admin
@@ -177,7 +185,9 @@ export const loginAdmin = async (req, res) => {
       success: true,
       message: 'Login successful',
       userId: user._id,
-      role: user.role
+      role: user.role,
+      accessLevel: adminDetails.accessLevel,
+      permissions: adminDetails.permissions
     });
   } catch (error) {
     console.error('Login error:', error);
