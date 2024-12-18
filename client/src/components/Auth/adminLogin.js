@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from "../ui/alert";
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import logo from "../../assets/img/logo.svg";
-
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://empower-pwd.onrender.com/api'
-    : '/api';
 
 const AdminLogin = () => {
     const [email, setEmail] = useState(() => {
@@ -30,42 +26,17 @@ const AdminLogin = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await axios.post(
-                `${API_BASE_URL}/admin/login`,
-                { email, password },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    withCredentials: true
-                }
-            );
+            const response = await axios.post('https://empower-pwd.onrender.com/api/admin/login', { 
+                email, 
+                password 
+            });
 
-            console.log('Login response:', response.data);
-
-            if (!response.data.success) {
-                throw new Error(response.data.message || 'Login failed');
-            }
-
-            const userData = response.data.user;
-            if (!userData) {
-                throw new Error('No user data received');
-            }
-
-            // Create cookie expiry date (e.g., 7 days from now)
-            const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + 7);
-
-            // Set cookie with token if it's provided in the response
             if (response.data.token) {
-                document.cookie = `adminToken=${response.data.token}; expires=${expiryDate.toUTCString()}; path=/; secure; samesite=strict`;
+                localStorage.setItem('token', response.data.token); // Make sure to store the token
             }
-
-            localStorage.setItem('userId', userData._id);
-            localStorage.setItem('userRole', userData.role);
-            localStorage.setItem('accessLevel', userData.accessLevel);
-            localStorage.setItem('permissions', JSON.stringify(userData.permissions));
+            
+            localStorage.setItem('userId', response.data.userId);
+            localStorage.setItem('userRole', response.data.role);
 
             setStatus({
                 type: 'success',
@@ -80,49 +51,28 @@ const AdminLogin = () => {
                 localStorage.setItem('rememberMe', 'false');
             }
 
-            if (userData.role === 'admin') {
-                navigate('/admin/dashboard');
-            } else {
-                throw new Error('Insufficient permissions');
-            }
-
+            navigate('/admin/dashboard');
         } catch (error) {
-            console.error('Login error:', error);
+            let errorMessage = 'An error occurred during login. Please try again.';
+            
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                errorMessage = error.response.data.message || errorMessage;
+            } else if (error.request) {
+                // The request was made but no response was received
+                errorMessage = 'No response from server. Please check your internet connection.';
+            }
+            
             setStatus({
                 type: 'error',
-                message: error.response?.data?.message || error.message || 'Invalid credentials, please try again.'
+                message: errorMessage
             });
-
-            // Clear any existing auth data on error
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userRole');
-            localStorage.removeItem('accessLevel');
-            localStorage.removeItem('permissions');
-            // Clear the auth cookie
-            document.cookie = 'adminToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            console.error('Login error:', error);
         } finally {
             setIsLoading(false);
         }
     };
-
-    // Add a helper function to check for cookie
-    const getAdminToken = () => {
-        const cookies = document.cookie.split(';');
-        const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('adminToken='));
-        return tokenCookie ? tokenCookie.split('=')[1] : null;
-    };
-
-    // Update the check for logged-in status
-    useEffect(() => {
-        const userId = localStorage.getItem('userId');
-        const userRole = localStorage.getItem('userRole');
-        const accessLevel = localStorage.getItem('accessLevel');
-        const token = getAdminToken();
-        
-        if (userId && userRole === 'admin' && accessLevel && token) {
-            navigate('/admin/dashboard');
-        }
-    }, [navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white font-poppins">
