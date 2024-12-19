@@ -726,7 +726,6 @@ const MyApplications = () => {
 
   const handleFilter = (applications) => {
     return applications.filter(app => {
-      // Add null checks and data transformation
       const jobTitle = app.jobId?.jobTitle || '';
       const companyName = app.jobId?.employersId?.companyInfo?.companyName || '';
       
@@ -735,8 +734,11 @@ const MyApplications = () => {
         companyName.toLowerCase().includes(searchTerm.toLowerCase())
       );
       
-      const matchesStatus = filterStatus === 'All' || app.status === filterStatus;
+      if (filterStatus === 'All') {
+        return matchesSearch && app.status.toLowerCase() !== 'rejected';
+      }
       
+      const matchesStatus = app.status === filterStatus;
       return matchesSearch && matchesStatus;
     });
   };
@@ -1307,14 +1309,14 @@ const MyApplications = () => {
               color: 'yellow'
             },
             {
-              label: 'Interviews',
+              label: 'Interview',
               value: applications.filter(app => app.status.toLowerCase() === 'interview scheduled').length,
               icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
               color: 'emerald'
             },
             {
-              label: 'Completed',
-              value: applications.filter(app => app.status.toLowerCase() === 'completed').length,
+              label: 'Accepted',
+              value: applications.filter(app => app.status.toLowerCase() === 'accepted').length,
               icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
               color: 'blue'
             }
@@ -1445,9 +1447,9 @@ const MyApplications = () => {
                             >
                               <option value="All">All Status</option>
                               <option value="Pending">Pending</option>
-                              <option value="Interview Scheduled">Interview Scheduled</option>
-                              <option value="Completed">Completed</option>
-                              <option value="Rejected">Rejected</option>
+                              <option value="Interview Scheduled">Interview</option>
+                              <option value="Accepted">Accepted</option>
+                              <option value="Cancelled">Cancelled</option>
                             </select>
                           </div>
 

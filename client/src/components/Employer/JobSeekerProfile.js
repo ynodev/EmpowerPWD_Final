@@ -38,14 +38,14 @@ const JobSeekerProfile = () => {
   };
 
   const InfoField = ({ label, value }) => (
-    <div className="mb-4">
-      <label className="text-sm text-gray-500 block mb-1">{label}</label>
+    <div className="space-y-1">
+      <label className="text-sm text-gray-500">{label}</label>
       <p className="font-medium text-gray-800">{value || 'Not specified'}</p>
     </div>
   );
 
   const SectionHeader = ({ icon: Icon, title }) => (
-    <div className="flex items-center gap-2 mb-6">
+    <div className="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4">
       <Icon className="w-5 h-5 text-blue-600" />
       <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
     </div>
@@ -73,145 +73,142 @@ const JobSeekerProfile = () => {
     <div className="min-h-screen bg-gray-50">
       <NavEmployer />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 group"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
           <span>Back to Application</span>
         </button>
 
         {/* Profile Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 mb-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-3">
                 {profileData.basicInfo?.firstName} {profileData.basicInfo?.lastName}
               </h1>
-              <div className="flex items-center gap-4 mt-2">
-                <span className="text-gray-500">
-                  <Mail className="w-4 h-4 inline mr-1" />
+              <div className="flex items-center justify-center gap-4 text-gray-600">
+                <span className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
                   {profileData.user?.email}
                 </span>
                 {profileData.basicInfo?.phoneNumber && (
-                  <span className="text-gray-500">
-                    <Phone className="w-4 h-4 inline mr-1" />
+                  <span className="flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
                     {profileData.basicInfo.phoneNumber}
                   </span>
                 )}
               </div>
             </div>
+
+            {/* About Me */}
+            {profileData.basicInfo?.aboutMe && (
+              <div className="bg-gray-50 rounded-xl p-6 text-center">
+                <p className="text-gray-700 leading-relaxed">
+                  {profileData.basicInfo.aboutMe}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
-          {/* About Me */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <SectionHeader icon={Info} title="About Me" />
-            <p className="text-gray-700 leading-relaxed">
-              {profileData.basicInfo?.aboutMe || 'No description provided'}
-            </p>
-          </div>
-
+        <div className="max-w-3xl mx-auto space-y-6">
           {/* Personal Information */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <SectionHeader icon={User} title="Personal Information" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <InfoField label="Age" value={profileData.basicInfo?.age} />
               <InfoField label="Gender" value={profileData.basicInfo?.gender} />
-              <InfoField label="Date of Birth" value={profileData.basicInfo?.dateOfBirth?.split('T')[0]} />
+              <InfoField 
+                label="Date of Birth" 
+                value={new Date(profileData.basicInfo?.dateOfBirth).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })} 
+              />
             </div>
           </div>
 
-          {/* Disability Information */}
-          {profileData.disabilityInfo && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <SectionHeader icon={Info} title="Disability Information" />
-              <div className="space-y-4">
-                {profileData.disabilityInfo.disabilityType && (
-                  <div>
-                    <label className="text-sm text-gray-500 block mb-2">Type</label>
-                    <div className="flex flex-wrap gap-2">
-                      {profileData.disabilityInfo.disabilityType.map((type, index) => (
-                        <span key={index} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm">
-                          {type}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {profileData.disabilityInfo.disabilityAdditionalInfo && (
-                  <div>
-                    <label className="text-sm text-gray-500 block mb-2">Additional Information</label>
-                    <p className="text-gray-700">{profileData.disabilityInfo.disabilityAdditionalInfo}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
           {/* Work Experience */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <SectionHeader icon={Briefcase} title="Work Experience" />
             {profileData.workExperience?.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {profileData.workExperience.map((exp, index) => (
-                  <div key={index} className="border-l-2 border-gray-200 pl-4">
-                    <h3 className="font-medium text-gray-900">{exp.previousJobTitle}</h3>
-                    <p className="text-gray-600 text-sm">{exp.companyName}</p>
-                    <p className="text-gray-500 text-sm mt-1">
-                      {new Date(exp.startDate).toLocaleDateString()} - 
-                      {exp.isCurrentlyWorking ? 'Present' : new Date(exp.endDate).toLocaleDateString()}
-                    </p>
-                    <p className="mt-2 text-gray-700">{exp.keyResponsibility}</p>
+                  <div key={index} className="relative pl-8 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-100">
+                    <div className="absolute left-0 top-2 w-2 h-2 rounded-full bg-blue-500 -translate-x-[5px]" />
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{exp.previousJobTitle}</h3>
+                      <p className="text-gray-600">{exp.companyName}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(exp.startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} - 
+                        {exp.isCurrentlyWorking ? ' Present' : 
+                          new Date(exp.endDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </p>
+                      <div className="bg-gray-50 rounded-lg p-4 mt-3">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Key Responsibilities:</h4>
+                        <p className="text-gray-600">{exp.keyResponsibility}</p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No work experience listed</p>
+              <p className="text-gray-500 text-center py-4">No work experience listed</p>
             )}
           </div>
 
           {/* Education */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <SectionHeader icon={GraduationCap} title="Education" />
             {profileData.education?.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {profileData.education.map((edu, index) => (
-                  <div key={index} className="border-l-2 border-gray-200 pl-4">
-                    <h3 className="font-medium text-gray-900">{edu.degree}</h3>
-                    <p className="text-gray-600 text-sm">{edu.school}</p>
-                    <p className="text-gray-500 text-sm mt-1">
-                      {new Date(edu.startDate).toLocaleDateString()} - 
-                      {edu.isCurrentlyEnrolled ? 'Present' : new Date(edu.endDate).toLocaleDateString()}
-                    </p>
-                    {edu.description && (
-                      <p className="mt-2 text-gray-700">{edu.description}</p>
-                    )}
+                  <div key={index} className="relative pl-8 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-blue-100">
+                    <div className="absolute left-0 top-2 w-2 h-2 rounded-full bg-blue-500 -translate-x-[5px]" />
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{edu.degree}</h3>
+                      <p className="text-gray-600">{edu.school}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(edu.startDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} - 
+                        {edu.isCurrentlyEnrolled ? ' Present' : 
+                          new Date(edu.endDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </p>
+                      {edu.description && (
+                        <div className="bg-gray-50 rounded-lg p-4 mt-3">
+                          <p className="text-gray-600">{edu.description}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No education history listed</p>
+              <p className="text-gray-500 text-center py-4">No education history listed</p>
             )}
           </div>
 
           {/* Skills */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <SectionHeader icon={Wrench} title="Skills" />
             {profileData.keySkills?.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {profileData.keySkills.map((skill, index) => (
-                  <span key={index} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full">
+                  <span 
+                    key={index} 
+                    className="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
+                  >
                     {skill}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500">No skills listed</p>
+              <p className="text-gray-500 text-center py-4">No skills listed</p>
             )}
           </div>
         </div>
