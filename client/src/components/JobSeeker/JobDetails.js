@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   MapPin, Clock, Building2, X, Calendar, DollarSign, 
   Briefcase, CheckCircle2, Award, Users, GraduationCap,
-  Globe, ChevronRight, ChevronLeft, Star, CheckCircle
+  Globe, ChevronRight, ChevronLeft, Star, CheckCircle, Building
 } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import axiosInstance from '../../utils/axios';
@@ -283,16 +283,21 @@ const JobDetails = ({ job, isOpen, onClose, onApply }) => {
           </button>
 
           <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-            {/* Company Logo */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white overflow-hidden border border-gray-100 rounded-xl flex-shrink-0">
+            {/* Company Logo - Updated with better placeholder */}
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-50 overflow-hidden border border-gray-100 rounded-xl flex-shrink-0">
               {job?.employer?.companyInfo?.companyLogo ? (
                 <img 
-                src={`${process.env.REACT_APP_API_URL}${job.employer.companyInfo.companyLogo}`}
-                alt={job.employer?.companyInfo?.companyName}
+                  src={`${process.env.REACT_APP_API_URL}${job.employer.companyInfo.companyLogo}`}
+                  alt={job.employer?.companyInfo?.companyName}
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Building2 className="w-6 h-6 text-gray-300 m-auto mt-3" />
+                <div className="flex flex-col items-center justify-center w-full h-full bg-gray-50">
+                  <Building className="w-6 h-6 text-gray-300" />
+                  <span className="text-xs text-gray-400 mt-0.5">
+                    {job.employer?.companyInfo?.companyName?.charAt(0) || 'C'}
+                  </span>
+                </div>
               )}
             </div>
             

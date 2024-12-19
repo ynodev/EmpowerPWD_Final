@@ -1,7 +1,7 @@
 import React from 'react';
 import { formatDistance } from 'date-fns';
 import { useState, useEffect } from 'react';
-import { MapPin, Building2, Clock, Briefcase, BookmarkPlus, BookmarkCheck, Pin, Star } from 'lucide-react';
+import { MapPin, Building2, Clock, Briefcase, BookmarkPlus, BookmarkCheck, Pin, Star, Building } from 'lucide-react';
 import axiosInstance from '../../utils/axios';
 
 
@@ -136,8 +136,11 @@ const JobCard = ({ job, onOpenDetails }) => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-2xl font-bold text-gray-300">
-              {companyName.charAt(0)}
+            <div className="flex flex-col items-center justify-center w-full h-full bg-gray-50">
+              <Building className="w-8 h-8 text-gray-300" />
+              <span className="text-xs text-gray-400 mt-1">
+                {companyName.charAt(0)}
+              </span>
             </div>
           )}
         </div>
