@@ -1,6 +1,7 @@
 import express from 'express';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import Interview from '../models/Interview.js';
+import JobApplication from '../models/jobApplicationModel.js';
 import mongoose from 'mongoose';
 import { createNotification } from '../models/notification.js';
 import {

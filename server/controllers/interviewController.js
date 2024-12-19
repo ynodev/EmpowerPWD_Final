@@ -298,10 +298,10 @@ export const createInterview = async (req, res) => {
     await interview.save();
     console.log('Interview saved successfully');
 
-    // Update application status
+    // Update application status using the imported model
     await JobApplication.findByIdAndUpdate(
       applicationId,
-      { status: 'Interview Pending' }
+      { status: 'interview' }  // Changed from 'Interview Pending' to match your enum
     );
 
     // Create notification

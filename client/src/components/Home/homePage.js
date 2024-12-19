@@ -416,7 +416,7 @@ const handleNextClick = () => {
                <div className="container mx-auto px-4 lg:px-6">
                   <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-0">
                      {/* Content Side */}
-                     <div className="w-full lg:w-1/2 space-y-6 lg:pr-12 mt-4 lg:mt-0">
+                     <div className="w-full lg:w-1/2 space-y-6 lg:pr-12 mt-4 lg:mt-12">
                         {/* Badge */}
                         <div className="inline-block px-4 py-2 bg-blue-50 rounded-full">
                            <span className="text-blue-600 font-medium text-sm">
@@ -453,6 +453,22 @@ const handleNextClick = () => {
                               <h4 className="text-xl lg:text-3xl font-bold text-blue-600">10K+</h4>
                               <p className="text-sm lg:text-base text-gray-600">Companies</p>
                            </div>
+                        </div>
+
+                        {/* CTA Buttons */}
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                          <Link 
+                            to="/login" 
+                            className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all transform hover:scale-105 text-center font-medium"
+                          >
+                            Find Jobs Now
+                          </Link>
+                          <Link 
+                            to="/user-type" 
+                            className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-all transform hover:scale-105 text-center font-medium"
+                          >
+                            Join Our Community
+                          </Link>
                         </div>
                      </div>
 
