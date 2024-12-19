@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { 
   Target, Globe, Zap, 
@@ -19,6 +19,10 @@ import adrian from "../../assets/img/adrian.png";
 import christine from "../../assets/img/christine.png";
 const AboutPage = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const teamMembers = [
     {

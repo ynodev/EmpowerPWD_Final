@@ -3,6 +3,9 @@ import { Search, Filter, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from "../../assets/img/logo.svg";
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://empower-pwd.onrender.com/api'
+  : '/api';
 
 const BlogsGuest = () => {
   const [blogs, setBlogs] = useState([]);
@@ -20,7 +23,7 @@ const BlogsGuest = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`);
+      const response = await fetch(`${API_BASE_URL}/blogs/public?type=${selectedType}&sort=${sortBy}&search=${searchQuery}`);
       const data = await response.json();
       
       if (data.success) {
@@ -49,9 +52,12 @@ const BlogsGuest = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 h-full">
         <div className="h-48 rounded-t-xl overflow-hidden">
           <img 
-            src={blog.thumbnail || '/default-blog-thumbnail.jpg'} 
+            src={blog.thumbnail || 'https://via.placeholder.com/400x300'} 
             alt={blog.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            onError={(e) => {
+              e.target.src = 'https://via.placeholder.com/400x300';
+            }}
           />
         </div>
         <div className="p-4">
@@ -107,6 +113,56 @@ const BlogsGuest = () => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
                        </svg>
                     </button>
+                    {isOpen && (
+                      <div className="fixed inset-0 bg-white z-50 md:hidden">
+                        <div className="flex flex-col h-full">
+                          <div className="flex justify-between items-center p-4 border-b">
+                            <div className="flex items-center">
+                              <img src={logo} alt="logo" className="w-8 h-8" />
+                              <span className="ml-2 text-lg font-semibold">EmpowerPWD</span>
+                            </div>
+                            <button 
+                              onClick={() => setIsOpen(false)}
+                              className="text-gray-600 hover:text-black"
+                            >
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          <nav className="flex flex-col p-4">
+                            <Link 
+                              to="/" 
+                              className="py-2 text-gray-600 hover:text-black"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              Home
+                            </Link>
+                            <Link 
+                              to="/about" 
+                              className="py-2 text-gray-600 hover:text-black"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              About Us
+                            </Link>
+                            <Link 
+                              to="/guest/blogs" 
+                              className="py-2 text-gray-600 hover:text-black"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              Blogs
+                            </Link>
+                            <Link 
+                              to="/login" 
+                              className="mt-4 bg-[#1A2755] text-white px-6 py-2 rounded-xl hover:bg-[#3532D9] transition-colors font-medium text-center"
+                              onClick={() => setIsOpen(false)}
+                            >
+                              SIGN IN
+                            </Link>
+                          </nav>
+                        </div>
+                      </div>
+                    )}
                  </header>
         {/* Header */}
         <div className="mb-8 mt-20">

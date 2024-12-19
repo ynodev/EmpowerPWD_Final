@@ -394,6 +394,16 @@ const handleNextClick = () => {
      </div>
    );
 
+   const scrollToSection = (sectionId) => {
+     const element = document.getElementById(sectionId);
+     if (element) {
+       element.scrollIntoView({ 
+         behavior: 'smooth',
+         block: 'start'
+       });
+     }
+   };
+
    return (
       <div className="min-h-screen bg-white font-poppins">
          <header className="fixed top-0 left-0 right-0 flex justify-between items-center px-4 sm:px-8 py-4 bg-white z-50 shadow-md">
@@ -403,12 +413,10 @@ const handleNextClick = () => {
             </div>
             <div className="hidden md:flex items-center space-x-8">
             <nav className="flex space-x-8">
-                  <a href="/" className="text-gray-600 hover:text-black font-medium">Home</a>
-                  <a href="#about" className="text-gray-600 hover:text-black font-medium">About Us</a>
-                  <a href="#featured-jobs" className="text-gray-600 hover:text-black font-medium">Featured Jobs</a>
-
-
-                  <a href="/guest/blogs" className="text-gray-600 hover:text-black font-medium">Blogs</a>
+                  <button onClick={() => scrollToSection('home')} className="text-gray-600 hover:text-black font-medium">Home</button>
+                  <button onClick={() => scrollToSection('about')} className="text-gray-600 hover:text-black font-medium">About Us</button>
+                  <button onClick={() => scrollToSection('featured-jobs')} className="text-gray-600 hover:text-black font-medium">Featured Jobs</button>
+                  <Link to="/guest/blogs" className="text-gray-600 hover:text-black font-medium">Blogs</Link>
                </nav>
                <Link 
                   to="/login" 
@@ -433,31 +441,40 @@ const handleNextClick = () => {
          <div className={`fixed inset-x-0 top-[73px] transform ${isOpen ? 'translate-y-0' : '-translate-y-full'} 
             transition-transform duration-300 ease-in-out md:hidden z-40`}>
             <div className="bg-white border-t shadow-lg">
-               <nav className="flex flex-col p-4 space-y-4">
-                  <a href="/" 
-                     className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
-                     onClick={() => setIsOpen(false)}
+               <nav className="flex flex-col space-y-4 p-4">
+                  <button 
+                    onClick={() => {
+                      scrollToSection('home');
+                      setIsOpen(false);
+                    }} 
+                    className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
                   >
-                     Home
-                  </a>
-                  <a href="#about" 
-                     className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
-                     onClick={() => setIsOpen(false)}
+                    Home
+                  </button>
+                  <button 
+                    onClick={() => {
+                      scrollToSection('about');
+                      setIsOpen(false);
+                    }} 
+                    className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
                   >
-                     About Us
-                  </a>
-                  <a href="#featured-jobs" 
-                     className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
-                     onClick={() => setIsOpen(false)}
+                    About Us
+                  </button>
+                  <button 
+                    onClick={() => {
+                      scrollToSection('featured-jobs');
+                      setIsOpen(false);
+                    }} 
+                    className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
                   >
-                     Featured Jobs
-                  </a>
-                  <a href="/guest/blogs" 
-                     className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
-                     onClick={() => setIsOpen(false)}
+                    Featured Jobs
+                  </button>
+                  <Link 
+                    to="/guest/blogs" 
+                    className="px-4 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
                   >
-                     Blogs
-                  </a>
+                    Blogs
+                  </Link>
                   <Link 
                      to="/login" 
                      className="px-4 py-2 text-center bg-[#1A2755] text-white rounded-lg hover:bg-[#3532D9] transition-colors"

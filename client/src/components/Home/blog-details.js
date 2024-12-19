@@ -4,6 +4,10 @@ import logo from "../../assets/img/logo.svg";
 import { useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowLeft, Clock, User, Tag } from 'lucide-react';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://empower-pwd.onrender.com/api'
+  : '/api';
+
 const BlogGuestView = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,7 +19,18 @@ const BlogGuestView = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await fetch(`/api/blogs/public/${id}`);
+        const response = await fetch(`${API_BASE_URL}/blogs/public/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         
         if (data.success) {
@@ -175,9 +190,12 @@ const BlogGuestView = () => {
           {blog.thumbnail && (
             <div className="relative h-[300px] md:h-[450px]">
               <img 
-                src={blog.thumbnail} 
+                src={blog.thumbnail || 'https://via.placeholder.com/800x400'} 
                 alt={blog.title}
                 className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/800x400';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
               
