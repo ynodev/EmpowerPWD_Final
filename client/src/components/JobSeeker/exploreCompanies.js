@@ -560,7 +560,7 @@ const ExploreCompanies = () => {
                         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl flex-shrink-0">
                           {company.logo ? (
                             <img 
-                              src={company.logo} 
+                              src={`${process.env.REACT_APP_API_URL}${company.logo}`} 
                               alt={company.name} 
                               className="w-full h-full object-cover rounded-xl"
                             />

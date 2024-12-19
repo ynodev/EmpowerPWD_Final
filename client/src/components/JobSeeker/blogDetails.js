@@ -162,25 +162,28 @@ const BlogDetails = () => {
                       alt={blog.title}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
                     
-                    <div className="absolute bottom-0 left-0 right-0 p-8">
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-white/10
-                          ${blog.type === 'Article' ? 'text-blue-200' :
-                            blog.type === 'Guide' ? 'text-green-200' :
-                            blog.type === 'News' ? 'text-purple-200' :
-                            'text-orange-200'}`}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8">
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium 
+                          backdrop-blur-sm bg-white/20
+                          ${blog.type === 'Article' ? 'text-blue-100' :
+                            blog.type === 'Guide' ? 'text-green-100' :
+                            blog.type === 'News' ? 'text-purple-100' :
+                            'text-orange-100'}`}
                         >
                           {blog.type}
                         </span>
-                        <span className="text-sm text-gray-200">
+                        <span className="text-xs text-gray-200 backdrop-blur-sm bg-black/20 px-2 py-1 rounded-full">
                           {new Date(blog.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      <h1 className="text-3xl font-bold mb-4 text-white">{blog.title}</h1>
+                      <h1 className="text-xl sm:text-3xl font-bold mb-3 text-white">{blog.title}</h1>
                       <div className="flex items-center gap-2 text-sm text-gray-200">
-                        <span>By {blog.author}</span>
+                        <span className="backdrop-blur-sm bg-black/20 px-2 py-1 rounded-full">
+                          By {blog.author}
+                        </span>
                       </div>
                     </div>
                   </div>

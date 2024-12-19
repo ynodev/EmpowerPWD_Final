@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
-import { MoreVertical, Calendar as CalendarIcon, ChevronDown, Filter, X, Clock, CheckCircle2, Eye, MessageCircle, Trash2 } from 'lucide-react';
+import { MoreVertical, Calendar as CalendarIcon, ChevronDown, Filter, X, Clock, CheckCircle2, Eye, MessageCircle, Trash2, Building } from 'lucide-react';
 import axios from 'axios';
 import NavSeeker from '../ui/navSeeker';
 import MessageModal from '../messages/MessageModal';
@@ -277,14 +277,17 @@ const ApplicationCard = ({ application, onActionSelect, fetchApplications }) => 
               <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center">
                 {company.logo ? (
                   <img 
-                    src={company.logo} 
+                    src={`${process.env.REACT_APP_API_URL}${company.logo}`} 
                     alt={company.name}
                     className="w-full h-full object-contain rounded-xl"
                   />
                 ) : (
-                  <span className="text-2xl font-medium text-gray-500">
-                    {company.name ? company.name.charAt(0) : 'N/A'}
-                  </span>
+                  <div className="flex flex-col items-center justify-center w-full h-full bg-gray-50">
+                    <Building className="w-8 h-8 text-gray-300" />
+                    <span className="text-xs text-gray-400 mt-1">
+                      {company.name ? company.name.charAt(0) : 'N/A'}
+                    </span>
+                  </div>
                 )}
               </div>
 
