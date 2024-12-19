@@ -424,7 +424,7 @@ const handleNextClick = () => {
                            </span>
                         </div>
                         
-                        {/* Main Heading - Adjusted spacing */}
+                        {/* Main Heading */}
                         <div className="space-y-4">
                            <h1 className="text-3xl lg:text-6xl text-black font-extrabold leading-tight">
                               Find <span className="text-blue-600">Opportunities</span>
@@ -439,7 +439,7 @@ const handleNextClick = () => {
                            </p>
                         </div>
                         
-                        {/* Stats - Adjusted for mobile */}
+                        {/* Stats */}
                         <div className="flex flex-wrap gap-6 lg:gap-8 py-4 lg:py-6">
                            <div>
                               <h4 className="text-xl lg:text-3xl font-bold text-blue-600">20K+</h4>
@@ -454,57 +454,9 @@ const handleNextClick = () => {
                               <p className="text-sm lg:text-base text-gray-600">Companies</p>
                            </div>
                         </div>
-
-                        {/* Search Box - Adjusted padding and spacing */}
-                        <div className="bg-white p-4 lg:p-3 rounded-2xl shadow-lg max-w-2xl mt-6 lg:mt-0">
-                           <div className="flex flex-col md:flex-row gap-4">
-                              <div className="flex-1 relative">
-                                 <div className="absolute left-4 top-3.5 text-gray-400">
-                                    <i className="fas fa-search"></i>
-                                 </div>
-                                 <input
-                                    type="text"
-                                    placeholder="Job Title or Keyword"
-                                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                 />
-                              </div>
-                              <div className="flex-1 relative">
-                                 <div className="absolute left-4 top-3.5 text-gray-400">
-                                    <i className="fas fa-map-marker-alt"></i>
-                                 </div>
-                                 <input
-                                    type="text"
-                                    placeholder="Location"
-                                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                                 />
-                              </div>
-                              <button className="bg-blue-600 text-white px-8 py-3 rounded-xl hover:bg-blue-700 transition-colors whitespace-nowrap">
-                                 Search Jobs
-                              </button>
-                           </div>
-                        </div>
-
-                        {/* Popular Searches - Added mobile spacing */}
-                        <div className="pt-6 lg:pt-4">
-                           <p className="text-gray-600 mb-3">Popular Searches:</p>
-                           <div className="flex flex-wrap gap-2">
-                              <span className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-gray-200 cursor-pointer">
-                                 Remote Jobs
-                              </span>
-                              <span className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-gray-200 cursor-pointer">
-                                 Tech Jobs
-                              </span>
-                              <span className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-gray-200 cursor-pointer">
-                                 Healthcare
-                              </span>
-                              <span className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-gray-200 cursor-pointer">
-                                 Customer Service
-                              </span>
-                           </div>
-                        </div>
                      </div>
 
-                     {/* Image Side - Adjusted for better mobile display */}
+                     {/* Image Side */}
                      <div className="lg:w-1/2 relative pl-20 mt-8 lg:mt-0">
                         {/* Decorative elements */}
                         <div className="absolute -top-10 right-0 w-72 h-72 bg-blue-100/50 rounded-full blur-3xl"></div>
@@ -523,7 +475,7 @@ const handleNextClick = () => {
                      </div>
                   </div>
 
-                  {/* Trusted Companies - Adjusted spacing */}
+                  {/* Trusted Companies - Moved up */}
                   <div className="mt-12 lg:mt-16 text-center px-4 lg:px-0">
                      <p className="text-gray-600 mb-6">Trusted by leading companies</p>
                      <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8 opacity-75">
@@ -536,7 +488,7 @@ const handleNextClick = () => {
                </div>
             </section>
 
-            <section  id="about" className="py-20 lg:py-24 bg-white">
+            <section id="about" className="py-20 lg:py-24 bg-white">
                <div className="container mx-auto px-4 lg:px-6">
                   <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                      {/* Content Side */}
