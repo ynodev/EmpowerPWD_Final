@@ -20,22 +20,53 @@ const JobSeekerProfile = () => {
 
   const fetchProfile = async () => {
     try {
-      console.log('Fetching profile for seekerId:', seekerId); // Debug log
-      
+      setLoading(true);
       const response = await axios.get(`/api/employer/jobseeker/${seekerId}`, {
         withCredentials: true
       });
       
-      console.log('Profile response:', response.data); // Debug log
-      
-      setProfileData(response.data.profile);
-      setLoading(false);
+      if (response.data.success) {
+        setProfileData(response.data.profile);
+      } else {
+        throw new Error(response.data.message || 'Failed to fetch profile');
+      }
     } catch (err) {
-      console.error('Error fetching profile:', err.response?.data || err); // Enhanced error logging
-      setError(err.response?.data?.message || 'Error fetching profile');
+      console.error('Error fetching profile:', err);
+      setError(err.message || 'Error fetching profile');
+    } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-red-500 text-center">
+          <p className="text-xl font-semibold mb-2">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500 text-center">
+          <p className="text-xl font-semibold">No Profile Data</p>
+          <p>Profile information not available</p>
+        </div>
+      </div>
+    );
+  }
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -86,14 +117,14 @@ const JobSeekerProfile = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 mb-6">
               <div className="text-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                  {profileData.basicInfo?.firstName} {profileData.basicInfo?.lastName}
+                  {profileData?.basicInfo?.firstName} {profileData?.basicInfo?.lastName}
                 </h1>
                 <div className="flex items-center justify-center gap-4 text-gray-600">
                   <span className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
-                    {profileData.user?.email}
+                    {profileData?.user?.email}
                   </span>
-                  {profileData.basicInfo?.phoneNumber && (
+                  {profileData?.basicInfo?.phoneNumber && (
                     <span className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
                       {profileData.basicInfo.phoneNumber}
@@ -103,7 +134,7 @@ const JobSeekerProfile = () => {
               </div>
 
               {/* About Me */}
-              {profileData.basicInfo?.aboutMe && (
+              {profileData?.basicInfo?.aboutMe && (
                 <div className="bg-gray-50 rounded-xl p-6 text-center">
                   <p className="text-gray-700 leading-relaxed">
                     {profileData.basicInfo.aboutMe}

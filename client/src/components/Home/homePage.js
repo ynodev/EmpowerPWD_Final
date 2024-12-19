@@ -408,15 +408,15 @@ const handleNextClick = () => {
    return (
       <div className="min-h-screen bg-white font-poppins">
          <SharedNav />
-         <main className="pt-16 max-w-[1440px] mx-auto">
-            <section className="relative py-8 lg:py-12 overflow-hidden">
+         <main className="pt-8 max-w-[1440px] mx-auto">
+            <section className="relative py-6 lg:py-8 overflow-hidden">
                {/* Background decoration */}
                <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-50/50 rounded-l-[100px] -z-10 hidden lg:block"></div>
                
                <div className="container mx-auto px-4 lg:px-6">
-                  <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-0">
+                  <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-0">
                      {/* Content Side */}
-                     <div className="w-full lg:w-1/2 space-y-6 lg:pr-12 mt-4 lg:mt-12">
+                     <div className="w-full lg:w-1/2 space-y-4 lg:pr-12">
                         {/* Badge */}
                         <div className="inline-block px-4 py-2 bg-blue-50 rounded-full">
                            <span className="text-blue-600 font-medium text-sm">
@@ -425,7 +425,7 @@ const handleNextClick = () => {
                         </div>
                         
                         {/* Main Heading */}
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                            <h1 className="text-3xl lg:text-6xl text-black font-extrabold leading-tight">
                               Find <span className="text-blue-600">Opportunities</span>
                               <br />
@@ -440,7 +440,7 @@ const handleNextClick = () => {
                         </div>
                         
                         {/* Stats */}
-                        <div className="flex flex-wrap gap-6 lg:gap-8 py-4 lg:py-6">
+                        <div className="flex flex-wrap gap-4 lg:gap-6 py-3 lg:py-4">
                            <div>
                               <h4 className="text-xl lg:text-3xl font-bold text-blue-600">20K+</h4>
                               <p className="text-sm lg:text-base text-gray-600">Active Jobs</p>
@@ -456,16 +456,16 @@ const handleNextClick = () => {
                         </div>
 
                         {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <div className="flex flex-col sm:flex-row gap-3 pt-3">
                           <Link 
                             to="/login" 
-                            className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all transform hover:scale-105 text-center font-medium"
+                            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all transform hover:scale-105 text-center font-medium"
                           >
                             Find Jobs Now
                           </Link>
                           <Link 
                             to="/user-type" 
-                            className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-all transform hover:scale-105 text-center font-medium"
+                            className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-xl hover:bg-blue-50 transition-all transform hover:scale-105 text-center font-medium"
                           >
                             Join Our Community
                           </Link>
@@ -473,7 +473,7 @@ const handleNextClick = () => {
                      </div>
 
                      {/* Image Side */}
-                     <div className="lg:w-1/2 relative pl-20 mt-8 lg:mt-0">
+                     <div className="lg:w-1/2 relative pl-20 mt-6 lg:mt-0">
                         {/* Decorative elements */}
                         <div className="absolute -top-10 right-0 w-72 h-72 bg-blue-100/50 rounded-full blur-3xl"></div>
                         <div className="absolute -bottom-10 right-20 w-72 h-72 bg-blue-200/50 rounded-full blur-3xl"></div>
@@ -492,8 +492,8 @@ const handleNextClick = () => {
                   </div>
 
                   {/* Trusted Companies - Moved up */}
-                  <div className="mt-12 lg:mt-16 text-center px-4 lg:px-0">
-                     <p className="text-gray-600 mb-6">Trusted by leading companies</p>
+                  <div className="mt-8 lg:mt-12 text-center px-4 lg:px-0">
+                     <p className="text-gray-600 mb-4">Trusted by leading companies</p>
                      <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-8 opacity-75">
                         <img src={google} alt="Google logo" className="h-8 lg:h-10 grayscale hover:grayscale-0 transition-all"/>
                         <img src={cocacola} alt="Coca Cola logo" className="h-8 lg:h-10 grayscale hover:grayscale-0 transition-all"/>
@@ -746,56 +746,56 @@ const handleNextClick = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 bg-[#EEF0FC] p-4 lg:p-8 rounded-xl shadow-md">
                      {[
                         {
-                           icon: "����",
+                           icon: "",
                            title: "What is EmpowerPWD?",
                            description: "Here for the first time? Learn how EmpowerPWD can help you grow.",
                            answer: "EmpowerPWD is a dedicated platform connecting persons with disabilities to inclusive employment opportunities. We provide tools, resources, and support to help both job seekers and employers create successful partnerships.",
                            link: "#"
                         },
                         {
-                           icon: "💼",
+                           icon: "",
                            title: "The Platform",
                            description: "Tracking your applications and managing your profile.",
                            answer: "The platform allows job seekers to create profiles, search for jobs, apply for jobs, and manage their job applications efficiently. Employers can post job listings, review applications, and manage their company profiles.",
                            link: "#"
                         },
                         {
-                           icon: "🚀",
+                           icon: "",
                            title: "Getting Started",
                            description: "Everything you need to know to get started with EmpowerPWD.",
                            answer: "To get started with EmpowerPWD, you need to register as a job seeker or an employer. Once registered, you can create a profile, search for jobs, apply for jobs, and manage your job applications efficiently. Employers can post job listings, review applications, and manage their company profiles.",
                            link: "#"
                         },
                         {
-                           icon: "🎮",
+                           icon: "",
                            title: "Job Search",
                            description: "Learn how to search and apply for jobs effectively.",
                            answer: "To search for jobs effectively, you can use the search bar to search for job titles, keywords, or locations. You can also filter jobs based on category, location, and company. Once you find a job that interests you, you can apply for it by clicking the 'Apply Now' button.",
                            link: "#"
                         },
                         {
-                           icon: "💬",
+                           icon: "",
                            title: "Messaging",
                            description: "Connect and communicate with potential employers.",
                            answer: "You can connect and communicate with potential employers by sending messages through the platform. Employers can send messages to job seekers, and job seekers can send messages to employers.",
                            link: "#"
                         },
                         {
-                           icon: "📥",
+                           icon: "",
                            title: "Applications",
                            description: "Track and manage your job applications efficiently.",
                            answer: "You can track and manage your job applications efficiently by using the platform's features. You can view your job applications, update your application status, and receive notifications about your job applications.",
                            link: "#"
                         },
                         {
-                           icon: "🤖",
+                           icon: "",
                            title: "Resources",
                            description: "Access training materials and helpful resources.",
                            answer: "You can access training materials and helpful resources by using the platform's features. You can view training materials, read articles, and access other resources related to job searching and employment.",
                            link: "#"
                         },
                         {
-                           icon: "🤖",
+                           icon: "",
                            title: "Support",
                            description: "Get help and support whenever you need it.",
                            answer: "You can get help and support whenever you need it by using the platform's features. You can contact our support team through the 'Get in Touch' section on the homepage. You can also receive support from other users through the platform's features.",
