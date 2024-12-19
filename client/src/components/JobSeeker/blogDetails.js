@@ -12,9 +12,12 @@ const BlogSuggestionCard = ({ blog }) => (
   <Link to={`/blogs/${blog._id}`} className="flex gap-3 p-3 hover:bg-gray-50 rounded-lg transition-all">
     <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
       <img 
-        src={blog.thumbnail || '/default-blog-thumbnail.jpg'} 
+        src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/400x300'} 
         alt={blog.title}
         className="w-full h-full object-cover"
+        onError={(e) => {
+          e.target.src = 'https://via.placeholder.com/400x300';
+        }}
       />
     </div>
     <div className="flex-1">
@@ -95,9 +98,12 @@ const BlogDetails = () => {
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
       <div className="h-48 rounded-t-xl overflow-hidden">
         <img 
-          src={blog.thumbnail || '/default-blog-thumbnail.jpg'} 
+          src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/400x300'} 
           alt={blog.title}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/400x300';
+          }}
         />
       </div>
       <div className="p-4">
@@ -158,9 +164,12 @@ const BlogDetails = () => {
                 {blog.thumbnail && (
                   <div className="relative h-[300px] md:h-[400px]">
                     <img 
-                      src={blog.thumbnail} 
+                      src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/800x400'} 
                       alt={blog.title}
                       className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/800x400';
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
                     

@@ -136,67 +136,66 @@ const BlogGuestView = () => {
           <span className="text-gray-500 font-medium">Back to Blogs</span>
         </button>
         
-        {/* Blog Header with Cover Image */}
-        <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
-          {blog.thumbnail && (
-            <div className="relative h-[300px] md:h-[450px]">
-              <img 
-                src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/800x400'} 
-                alt={blog.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/800x400';
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-white/20 flex items-center gap-2 ${
-                    blog.type === 'Article' ? 'text-blue-200' :
-                    blog.type === 'Guide' ? 'text-green-200' :
-                    blog.type === 'News' ? 'text-purple-200' :
-                    'text-orange-200'
-                  }`}>
-                    <Tag className="h-4 w-4" />
-                    {blog.type}
-                  </span>
-                  <span className="text-sm text-gray-200 flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    {new Date(blog.createdAt).toLocaleDateString()}
-                  </span>
+        {/* Main Content and Sidebar Container */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Content Column */}
+          <div className="flex-1">
+            {/* Blog Header with Cover Image */}
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
+              {blog.thumbnail && (
+                <div className="relative h-[300px] md:h-[450px]">
+                  <img 
+                    src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/800x400'} 
+                    alt={blog.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/800x400';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  
+                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-white/20 flex items-center gap-2 ${
+                        blog.type === 'Article' ? 'text-blue-200' :
+                        blog.type === 'Guide' ? 'text-green-200' :
+                        blog.type === 'News' ? 'text-purple-200' :
+                        'text-orange-200'
+                      }`}>
+                        <Tag className="h-4 w-4" />
+                        {blog.type}
+                      </span>
+                      <span className="text-sm text-gray-200 flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        {new Date(blog.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4 text-shadow">{blog.title}</h1>
+                    <div className="flex items-center gap-2 text-sm text-gray-200">
+                      <User className="h-5 w-5" />
+                      <span>By {blog.author}</span>
+                    </div>
+                  </div>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-4 text-shadow">{blog.title}</h1>
-                <div className="flex items-center gap-2 text-sm text-gray-200">
-                  <User className="h-5 w-5" />
-                  <span>By {blog.author}</span>
-                </div>
+              )}
+
+              {/* Description Section */}
+              <div className="p-6 md:p-8 text-left">
+                <p className="text-gray-600 text-left text-lg leading-relaxed italic">{blog.description}</p>
               </div>
             </div>
-          )}
 
-          {/* Description Section */}
-          <div className="p-6 md:p-8 text-left">
-            <p className="text-gray-600 text-left text-lg leading-relaxed italic">{blog.description}</p>
-          </div>
-        </div>
-
-        {/* Blog Content */}
-        <div className="bg-white rounded-3xl shadow-lg mt-6 p-6 md:p-8">
-          <div className="prose prose-blue max-w-none text-left">
-            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* ... existing blog content ... */}
+            {/* Blog Content */}
+            <div className="bg-white rounded-3xl shadow-lg mt-6 p-6 md:p-8">
+              <div className="prose prose-blue max-w-none text-left">
+                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+              </div>
+            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar with Recent Posts */}
           {recentBlogs.length > 0 && (
-            <div className="lg:w-80 xl:w-96">
+            <div className="lg:w-80 xl:w-96 lg:sticky lg:top-24 lg:self-start">
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Posts</h3>
                 <div className="space-y-4">

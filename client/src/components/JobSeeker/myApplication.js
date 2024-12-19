@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
-import { MoreVertical, Calendar as CalendarIcon, ChevronDown, Filter, X, Clock, CheckCircle2, Eye, MessageCircle, Trash2, Building } from 'lucide-react';
+import { MoreVertical, Calendar as CalendarIcon, ChevronDown, Filter, X, Clock, CheckCircle2, Eye, MessageCircle, Trash2, Building, MapPin, Briefcase, DollarSign, Building2, Globe } from 'lucide-react';
 import axios from 'axios';
 import NavSeeker from '../ui/navSeeker';
 import MessageModal from '../messages/MessageModal';
@@ -13,50 +13,46 @@ const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
 
 const StatusIndicator = ({ status }) => {
-  // Default status styles to handle undefined/unknown status
-  const defaultStyle = {
-    bg: 'bg-gray-50',
-    text: 'text-gray-700',
-    border: 'border-black',
-    dot: 'bg-gray-400'
-  };
-
   const statusStyles = {
     'pending': {
       bg: 'bg-yellow-50',
       text: 'text-yellow-700',
       border: 'border-yellow-200',
-      dot: 'bg-yellow-400'
+      icon: '⏳'
     },
     'scheduled': {
       bg: 'bg-emerald-50',
       text: 'text-emerald-700',
       border: 'border-emerald-200',
-      dot: 'bg-emerald-400'
+      icon: '📅'
     },
     'rejected': {
       bg: 'bg-red-50',
       text: 'text-red-700',
       border: 'border-red-200',
-      dot: 'bg-red-400'
+      icon: '❌'
     },
     'accepted': {
       bg: 'bg-blue-50',
       text: 'text-blue-700',
       border: 'border-blue-200',
-      dot: 'bg-blue-400'
+      icon: '✅'
     }
   };
 
-  const style = statusStyles[status] || defaultStyle;
-  const displayStatus = status || 'Unknown';
+  const style = statusStyles[status.toLowerCase()] || {
+    bg: 'bg-gray-50',
+    text: 'text-gray-700',
+    border: 'border-gray-200',
+    icon: 'ℹ️'
+  };
 
   return (
-    <div className={`px-2.5 py-1 rounded-full border ${style.bg} ${style.border}`}>
-      <div className="flex items-center gap-1.5">
-        <div className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-        <span className={`text-xs font-medium ${style.text}`}>{displayStatus}</span>
-      </div>
+    <div className={`px-3 py-1.5 rounded-full border ${style.bg} ${style.border} flex items-center gap-2`}>
+      <span className="text-sm">{style.icon}</span>
+      <span className={`text-sm font-medium ${style.text}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
     </div>
   );
 };
@@ -280,6 +276,9 @@ const ApplicationCard = ({ application, onActionSelect, fetchApplications }) => 
                     src={`${process.env.REACT_APP_API_URL}${company.logo}`} 
                     alt={company.name}
                     className="w-full h-full object-contain rounded-xl"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/64';
+                    }}
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center w-full h-full bg-gray-50">
@@ -367,7 +366,7 @@ const ApplicationCard = ({ application, onActionSelect, fetchApplications }) => 
                   <>
                     <span>•</span>
                     <span>
-                      ${job.salary.min.toLocaleString()} - ${job.salary.max.toLocaleString()}
+                      {formatSalary(job.salary.min)} - {formatSalary(job.salary.max)}
                     </span>
                   </>
                 )}
@@ -614,6 +613,16 @@ const fetchRecurringSchedules = async (employerId) => {
     console.error('Error fetching recurring schedules:', error);
     throw error;
   }
+};
+
+// Update the formatSalary function
+const formatSalary = (amount) => {
+  return new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
 };
 
 const MyApplications = () => {

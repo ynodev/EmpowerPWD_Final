@@ -69,12 +69,15 @@ const Blogs = () => {
   };
 
   const BlogCard = ({ blog }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
+    <Link 
+      to={`/blogs/${blog._id}`}
+      className="block bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 group"
+    >
       <div className="h-48 rounded-t-xl overflow-hidden">
         <img 
           src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/400x300'} 
           alt={blog.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x300';
           }}
@@ -94,16 +97,15 @@ const Blogs = () => {
             {new Date(blog.createdAt).toLocaleDateString()}
           </span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem]">{blog.title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-blue-600 transition-colors">{blog.title}</h3>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2 min-h-[2.5rem]">{blog.description}</p>
-        <Link 
-          to={`/blogs/${blog._id}`}
-          className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center"
+        <span 
+          className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center group-hover:gap-2 transition-all"
         >
-          Read More <span className="ml-1">→</span>
-        </Link>
+          Read More <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 
   return (
