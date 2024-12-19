@@ -408,8 +408,8 @@ const handleNextClick = () => {
    return (
       <div className="min-h-screen bg-white font-poppins">
          <SharedNav />
-         <main className="pt-8 max-w-[1440px] mx-auto">
-            <section className="relative py-6 lg:py-8 overflow-hidden">
+         <main className="pt-4 max-w-[1440px] mx-auto">
+            <section className="relative py-4 lg:py-6 overflow-hidden">
                {/* Background decoration */}
                <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-50/50 rounded-l-[100px] -z-10 hidden lg:block"></div>
                
@@ -504,7 +504,7 @@ const handleNextClick = () => {
                </div>
             </section>
 
-            <section id="about" className="py-20 lg:py-24 bg-white">
+            <section id="about" className="py-16 lg:py-20 bg-white">
                <div className="container mx-auto px-4 lg:px-6">
                   <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                      {/* Content Side */}
@@ -588,6 +588,89 @@ const handleNextClick = () => {
                      </div>
                   </div>
                </div>
+            </section>
+
+            <section className="text-center bg-white py-16 lg:py-20">
+              <div className="flex flex-col items-center">
+                <h2 className="text-blue-600 text-md mb-2 font-semibold">How it works?</h2>
+                <h1 className="text-4xl lg:text-5xl font-extrabold text-center mb-12">
+                  Your Pathway to <br /> Inclusive Employment
+                </h1>
+                
+                <div className="flex flex-col lg:flex-row justify-center items-center gap-8 lg:gap-12 px-4">
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-4">
+                      <span className="text-blue-600 font-bold">1</span>
+                    </div>
+                    <div className="bg-white shadow-lg rounded-xl p-8 w-full lg:w-80 h-[350px] flex flex-col border">
+                      <div className="bg-[#D7E5FF] rounded-xl h-[140px] flex justify-left items-center mt-4">
+                        <div className="bg-[#E6EFFF] rounded-xl w-full mr-2 -ml-2 h-full -mt-4 flex items-center justify-center">
+                          <img
+                            src={profile}
+                            alt="Create profile"
+                            className="w-[230px] h-[180px] mb-4"
+                          />
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-blue-600 font-semibold mt-4">Create Your Profile</h3>
+                        <p className="text-gray-600 text-sm mt-4">
+                          Build a personalized profile highlighting your skills, experiences, and career goals.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-4">
+                      <span className="text-blue-600 font-bold">2</span>
+                    </div>
+                    <div className="bg-white shadow-lg rounded-xl p-8 w-full lg:w-80 h-[350px] flex flex-col border">
+                      <div className="bg-[#D7E5FF] rounded-xl h-[140px] flex justify-left items-center mt-4">
+                        <div className="bg-[#E6EFFF] rounded-xl w-full mr-2 -ml-2 h-full -mt-4 flex items-center justify-center">
+                          <img
+                            src={find}
+                            alt="Find opportunities"
+                            className="w-[200px] h-[160px] mb-4"
+                          />
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-blue-600 font-semibold mt-4">Find Opportunities</h3>
+                        <p className="text-gray-600 text-sm mt-4">
+                          Explore job listings from companies dedicated to diversity and inclusion.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-4">
+                      <span className="text-blue-600 font-bold">3</span>
+                    </div>
+                    <div className="bg-white shadow-lg rounded-tr-[100px] border p-8 w-full lg:w-80 h-[350px] flex flex-col">
+                      <div className="bg-[#D7E5FF] rounded-tr-[100px] h-[140px] flex justify-left items-center mt-4 pt-2">
+                        <div className="bg-[#E6EFFF] rounded-tr-[90px] h-full w-full mr-2 mt-auto -ml-2 flex items-center justify-center">
+                          <img
+                            src={apply}
+                            alt="Apply with confidence"
+                            className="w-[160px] h-[130px] mt-auto mr-2"
+                          />
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-blue-600 font-semibold mt-4">Apply with Confidence</h3>
+                        <p className="text-gray-600 text-sm mt-4">
+                          Submit your application to opportunities that align with your talents and aspirations.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className="py-10 lg:py-14 bg-gray-50 w-full">
