@@ -62,9 +62,17 @@ const ApplicationDetailsModal = ({ isOpen, onClose, application }) => {
       
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          {/* Header Section */}
+          {/* Header Section - Adjusted layout */}
           <div className="relative p-6 border-b border-gray-100">
-            <div className="flex items-start gap-4">
+            {/* Close button moved to absolute top-right corner */}
+            <button 
+              onClick={onClose}
+              className="absolute top-2 right-2 p-2 hover:bg-gray-100 rounded-xl transition-colors"
+            >
+              <X size={20} className="text-gray-400" />
+            </button>
+
+            <div className="flex items-start gap-4 pr-8"> {/* Added right padding to prevent overlap */}
               <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
                 {application.company.logo ? (
                   <img 
@@ -80,23 +88,18 @@ const ApplicationDetailsModal = ({ isOpen, onClose, application }) => {
                 )}
               </div>
               
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900">{application.job.title}</h2>
-                    <p className="text-gray-600 mt-1">{application.company.name}</p>
+              <div className="flex-1 min-w-0"> {/* Added min-width to prevent text overflow */}
+                <div className="flex items-start justify-between gap-4"> {/* Added gap between title and status */}
+                  <div className="flex-1 min-w-0"> {/* Allow title to shrink if needed */}
+                    <h2 className="text-xl font-semibold text-gray-900 truncate">{application.job.title}</h2>
+                    <p className="text-gray-600 mt-1 truncate">{application.company.name}</p>
                   </div>
-                  <StatusBadge status={application.status} />
+                  <div className="flex-shrink-0"> {/* Prevent status badge from shrinking */}
+                    <StatusBadge status={application.status} />
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <button 
-              onClick={onClose}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <X size={20} className="text-gray-400" />
-            </button>
           </div>
 
           {/* Content Section */}
