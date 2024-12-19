@@ -53,7 +53,7 @@ const BlogsGuest = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 h-full">
         <div className="h-48 rounded-t-xl overflow-hidden">
           <img 
-            src={blog.thumbnail || 'https://via.placeholder.com/400x300'} 
+            src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/400x300'} 
             alt={blog.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             onError={(e) => {

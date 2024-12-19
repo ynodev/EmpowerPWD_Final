@@ -108,7 +108,7 @@ const BlogGuestView = () => {
           {blog.thumbnail && (
             <div className="relative h-[300px] md:h-[450px]">
               <img 
-                src={blog.thumbnail || 'https://via.placeholder.com/800x400'} 
+                src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/800x400'} 
                 alt={blog.title}
                 className="absolute inset-0 w-full h-full object-cover"
                 onError={(e) => {

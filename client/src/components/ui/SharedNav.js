@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import { X } from 'lucide-react';
 import logo from "../../assets/img/logo.svg";
+import './PageTransition.css';
 
 const SharedNav = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -19,7 +20,7 @@ const SharedNav = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 flex justify-between items-center px-4 sm:px-8 py-4 bg-white z-50 shadow-md">
+      <header className="fixed top-0 left-0 right-0 flex justify-between items-center px-4 sm:px-8 py-4 bg-white z-50 shadow-md transition-all duration-300">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <img src={logo} alt="logo" className="w-8 h-8" />
@@ -53,9 +54,11 @@ const SharedNav = () => {
         </button>
       </header>
 
-      {/* Mobile Menu */}
-      <div className={`fixed inset-x-0 top-[73px] transform ${isOpen ? 'translate-y-0' : '-translate-y-full'} 
-        transition-transform duration-300 ease-in-out md:hidden z-40`}>
+      {/* Mobile Menu with smooth transition */}
+      <div 
+        className={`fixed inset-x-0 top-[73px] transform transition-transform duration-300 ease-in-out md:hidden z-40
+          ${isOpen ? 'translate-y-0' : '-translate-y-full'}`}
+      >
         <div className="bg-white border-t shadow-lg">
           <nav className="flex flex-col space-y-4 p-4">
             <Link 
@@ -90,12 +93,13 @@ const SharedNav = () => {
         </div>
       </div>
 
-      {/* Overlay */}
+      {/* Overlay with fade transition */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black transition-opacity duration-300 z-30 md:hidden"
+          style={{ opacity: isOpen ? 0.5 : 0 }}
           onClick={() => setIsOpen(false)}
-        ></div>
+        />
       )}
     </>
   );

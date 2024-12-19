@@ -70,104 +70,107 @@ import JobSeekerProfile from './components/Employer/JobSeekerProfile';
 import SDG15Website from './components/Home/sdg.js';
 import BlogsGuest from './components/Home/blog-guest';
 import BlogGuestView from './components/Home/blog-details.js';
+import PageTransition from './components/ui/PageTransition';
 const App = () => {
   return (
     <AuthProvider>
       <NotificationProvider>
         <Router>
-          <div className="app">
-            <div className="accessibility-widget">
-              <AccessibilityWidget />
+          <PageTransition>
+            <div className="app">
+              <div className="accessibility-widget">
+                <AccessibilityWidget />
+              </div>
+              <Routes>
+                {/* Main job board route */}
+                <Route path="/" element={<HomePageComponent />} />
+                <Route path="/job-list" element={<JobList />} />
+                <Route path="/jobs/:id" element={<JobDetails />} />
+                <Route path="/employers/view-job/:jobId" element={<ViewJob />} />
+                <Route path="/debug" element={<DebugManageJobs />} />
+                <Route path='/employer/application' element={<ApplicationDashboard />} />
+                <Route path="/employers/edit-job/:jobId" element={<EditJob />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/seeker/profile" element={<SeekerProfile />} />
+                <Route path="/admin/users/:userId" element={<UserDetailsView />} />
+
+                
+                {/* Admin routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/register" element={<AdminRegister />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/explore-companies" element={<ExploreCompanies />} />
+                <Route path="/admin/jobs" element={<JobManagement />} />
+                <Route path="/admin/jobs/:id" element={<JobDetailsAdmin />} />
+                <Route path="/admin/jobs/:jobId/review" element={<JobReview />} />
+                <Route path="/admin/resources" element={<AdminResources />} />
+                <Route path="/admin/user-management" element={<AllUsers />} />
+                <Route path="/admin/user-management/employers" element={<Employers />} />
+                <Route path="/admin/user-management/jobseekers" element={<JobSeekers />} />
+                <Route path="/admin/user-management/pending" element={<PendingVerification />} />
+                <Route path="/admin/users/:userId/review" element={<UserReview />} />
+
+                <Route path="/jobs/:id/apply" element={<JobApplication />} />
+                <Route path="/my-application" element={<MyApplicationDetails />} />
+
+                <Route path="/create-employer" element={<CreateEmployer />} />
+                <Route path="/RegisterjobSeeker" element={<CreateJobSeeker />} />
+                <Route path="/job-dashboard" element={<JobsDashboard />} />
+                <Route path="/Emp-Dashboard" element={<Dashboard />} />
+                <Route path="/employers/create-job" element={<JobPostingForm />} />
+                <Route path="/user-type" element={<Usertype />} />
+                <Route path="/seeker-type" element={<SeekerType />} />
+                <Route path="/forgot-pass" element={<ForgotPassword />} />
+                <Route path="/register-assistant" element={<RegisterAssistant />} />
+                <Route path="/saved-jobs" element={<SavedJobs />} />
+
+                <Route path="/messages/conversation/:userId" element={<Conversation />} />
+                <Route path="/messages" element={<MessagesPage />} />
+
+
+                <Route path="/employer/applications" element={<ApplicationDashboard />} />
+                <Route path="/employers/resources" element={<Resources />} />
+                <Route path="/employers/resources/view" element={React.createElement(ResourcesView)} />
+                <Route path="/employer/applications/:applicationId/review" element={<ApplicationReview />} />
+                <Route path="/employer/applications/:id" element={<ViewApplication />} />
+                <Route path="/employer/applications/:applicationId" element={<ApplicantDetails />} />
+                <Route path="/employer/schedule" element={<InterviewSchedule />} />
+                <Route path="/jobseeker/schedule" element={<JobSeekerSchedule />} />
+                <Route path="/video-call" element={<VideoCall />} />
+                {/* Video Call Routes */}
+                <Route path="/video" element={<VideoCallLanding />} />
+                <Route path="/video/create" element={<VideoCall />} />
+                <Route path="/video/join" element={<JoinCall />} />
+                <Route path="/video/room/:roomId" element={<VideoCall />} />
+
+                <Route path="/employer/profile" element={<EmployerProfile />} />
+
+                <Route path="/notifications" element={<Notification />} />
+
+                <Route path="/settings" element={<Settings />} />
+                
+                <Route path="/jobseeker/interviews" element={<JobSeekerInterviews />} />
+                <Route path="/blogs" element={<Blogs />} />
+                <Route path="/blogs/:id" element={<BlogDetails />} />
+                <Route path="/admin/management/admins" element={<AdminList />} />
+                <Route path="/admin/management/roles" element={<RolesManagement />} />
+                <Route path="/admin/verify-email/:token" element={<VerifyEmail />} />
+                <Route path="/admin/activity-logs" element={<ActivityLogs />} />
+                <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
+                <Route path="/admin/reset-password/:token" element={<ResetPassword />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/sdg" element={<SDG15Website />} />
+
+                <Route path="/guest/blogs" element={<BlogsGuest />} />
+                <Route path="/guest/blogs/:id" element={<BlogGuestView />} />
+
+
+                <Route path="/employer/jobseeker/:seekerId" element={<JobSeekerProfile />} />
+                <Route path="*" element={<NotFoundPage />} />
+                
+              </Routes>
             </div>
-            <Routes>
-              {/* Main job board route */}
-              <Route path="/" element={<HomePageComponent />} />
-              <Route path="/job-list" element={<JobList />} />
-              <Route path="/jobs/:id" element={<JobDetails />} />
-              <Route path="/employers/view-job/:jobId" element={<ViewJob />} />
-              <Route path="/debug" element={<DebugManageJobs />} />
-              <Route path='/employer/application' element={<ApplicationDashboard />} />
-              <Route path="/employers/edit-job/:jobId" element={<EditJob />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/seeker/profile" element={<SeekerProfile />} />
-              <Route path="/admin/users/:userId" element={<UserDetailsView />} />
-
-              
-              {/* Admin routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/register" element={<AdminRegister />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/explore-companies" element={<ExploreCompanies />} />
-              <Route path="/admin/jobs" element={<JobManagement />} />
-              <Route path="/admin/jobs/:id" element={<JobDetailsAdmin />} />
-              <Route path="/admin/jobs/:jobId/review" element={<JobReview />} />
-              <Route path="/admin/resources" element={<AdminResources />} />
-              <Route path="/admin/user-management" element={<AllUsers />} />
-              <Route path="/admin/user-management/employers" element={<Employers />} />
-              <Route path="/admin/user-management/jobseekers" element={<JobSeekers />} />
-              <Route path="/admin/user-management/pending" element={<PendingVerification />} />
-              <Route path="/admin/users/:userId/review" element={<UserReview />} />
-
-              <Route path="/jobs/:id/apply" element={<JobApplication />} />
-              <Route path="/my-application" element={<MyApplicationDetails />} />
-
-              <Route path="/create-employer" element={<CreateEmployer />} />
-              <Route path="/RegisterjobSeeker" element={<CreateJobSeeker />} />
-              <Route path="/job-dashboard" element={<JobsDashboard />} />
-              <Route path="/Emp-Dashboard" element={<Dashboard />} />
-              <Route path="/employers/create-job" element={<JobPostingForm />} />
-              <Route path="/user-type" element={<Usertype />} />
-              <Route path="/seeker-type" element={<SeekerType />} />
-              <Route path="/forgot-pass" element={<ForgotPassword />} />
-              <Route path="/register-assistant" element={<RegisterAssistant />} />
-              <Route path="/saved-jobs" element={<SavedJobs />} />
-
-              <Route path="/messages/conversation/:userId" element={<Conversation />} />
-              <Route path="/messages" element={<MessagesPage />} />
-
-
-              <Route path="/employer/applications" element={<ApplicationDashboard />} />
-              <Route path="/employers/resources" element={<Resources />} />
-              <Route path="/employers/resources/view" element={React.createElement(ResourcesView)} />
-              <Route path="/employer/applications/:applicationId/review" element={<ApplicationReview />} />
-              <Route path="/employer/applications/:id" element={<ViewApplication />} />
-              <Route path="/employer/applications/:applicationId" element={<ApplicantDetails />} />
-              <Route path="/employer/schedule" element={<InterviewSchedule />} />
-              <Route path="/jobseeker/schedule" element={<JobSeekerSchedule />} />
-              <Route path="/video-call" element={<VideoCall />} />
-              {/* Video Call Routes */}
-              <Route path="/video" element={<VideoCallLanding />} />
-              <Route path="/video/create" element={<VideoCall />} />
-              <Route path="/video/join" element={<JoinCall />} />
-              <Route path="/video/room/:roomId" element={<VideoCall />} />
-
-              <Route path="/employer/profile" element={<EmployerProfile />} />
-
-              <Route path="/notifications" element={<Notification />} />
-
-              <Route path="/settings" element={<Settings />} />
-              
-              <Route path="/jobseeker/interviews" element={<JobSeekerInterviews />} />
-              <Route path="/blogs" element={<Blogs />} />
-              <Route path="/blogs/:id" element={<BlogDetails />} />
-              <Route path="/admin/management/admins" element={<AdminList />} />
-              <Route path="/admin/management/roles" element={<RolesManagement />} />
-              <Route path="/admin/verify-email/:token" element={<VerifyEmail />} />
-              <Route path="/admin/activity-logs" element={<ActivityLogs />} />
-              <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
-              <Route path="/admin/reset-password/:token" element={<ResetPassword />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/sdg" element={<SDG15Website />} />
-
-              <Route path="/guest/blogs" element={<BlogsGuest />} />
-              <Route path="/guest/blogs/:id" element={<BlogGuestView />} />
-
-
-              <Route path="/employer/jobseeker/:seekerId" element={<JobSeekerProfile />} />
-              <Route path="*" element={<NotFoundPage />} />
-              
-            </Routes>
-          </div>
+          </PageTransition>
         </Router>
       </NotificationProvider>
     </AuthProvider>
