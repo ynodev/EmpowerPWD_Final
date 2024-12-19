@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import DatePicker from "react-datepicker";
@@ -20,6 +20,18 @@ import {
   getCitiesForProvince,
   getBarangaysForCity
 } from '../../data/philippineLocations';
+
+// Add this at the top of your component
+const MobileHeader = () => (
+  <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center z-50">
+    <Link to="/" className="flex items-center">
+      <img src={logo} alt="Logo" className="h-8 w-8" />
+    </Link>
+    <Link to="/login" className="text-blue-600 text-sm font-medium">
+      Login
+    </Link>
+  </div>
+);
 
 const steps = [
   { id: 1, title: 'Account Info', mobileTitle: '•' },
@@ -2550,11 +2562,17 @@ const CreateJobSeeker = () => {
         <SuccessRegistration />
       ) : (
         <div>
+          {/* Mobile Header */}
+          <MobileHeader />
+
+          {/* Desktop Navigation */}
           <div className="hidden md:block">
             <NavRegister steps={steps} currentStep={currentStep} />
           </div>
+
+          {/* Mobile Steps Indicator */}
           <div className="block md:hidden">
-            <div className="flex justify-center space-x-4 py-4">
+            <div className="flex justify-center space-x-4 py-4 mt-14"> {/* Added mt-14 to account for mobile header */}
               {steps.map((step) => (
                 <div
                   key={step.id}
