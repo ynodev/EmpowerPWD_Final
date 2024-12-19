@@ -16,28 +16,31 @@ const BlogGuestView = () => {
   const { id } = useParams();
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
+  const [recentBlogs, setRecentBlogs] = useState([]);
 
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchBlogAndRecent = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/blogs/public/${id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+        setLoading(true);
+        
+        // Fetch main blog
+        const blogResponse = await fetch(`${API_BASE_URL}/blogs/public/${id}`);
+        const blogData = await blogResponse.json();
+        
+        if (blogData.success) {
+          setBlog(blogData.blog);
+          
+          // Fetch recent blogs
+          const recentResponse = await fetch(
+            `${API_BASE_URL}/blogs/public?sort=newest&limit=5`
+          );
+          const recentData = await recentResponse.json();
+          
+          if (recentData.success) {
+            // Filter out current blog
+            const filteredRecent = recentData.blogs.filter(b => b._id !== id);
+            setRecentBlogs(filteredRecent.slice(0, 5));
           }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.success) {
-          setBlog(data.blog);
-        } else {
-          throw new Error(data.message);
         }
       } catch (error) {
         setError('Failed to fetch blog');
@@ -47,7 +50,7 @@ const BlogGuestView = () => {
       }
     };
 
-    fetchBlog();
+    fetchBlogAndRecent();
   }, [id]);
 
   // Add Poppins font import
@@ -60,6 +63,38 @@ const BlogGuestView = () => {
       document.head.removeChild(link);
     };
   }, []);
+
+  const RecentBlogCard = ({ blog }) => (
+    <Link 
+      to={`/guest/blogs/${blog._id}`} 
+      className="flex gap-3 p-3 hover:bg-gray-50 rounded-lg transition-all"
+    >
+      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+        <img 
+          src={blog.thumbnail ? `${process.env.REACT_APP_API_URL}${blog.thumbnail}` : 'https://via.placeholder.com/400x300'} 
+          alt={blog.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/400x300';
+          }}
+        />
+      </div>
+      <div className="flex-1">
+        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-1
+          ${blog.type === 'Article' ? 'bg-blue-100 text-blue-700' :
+            blog.type === 'Guide' ? 'bg-green-100 text-green-700' :
+            blog.type === 'News' ? 'bg-purple-100 text-purple-700' :
+            'bg-orange-100 text-orange-700'}`}
+        >
+          {blog.type}
+        </span>
+        <h4 className="text-sm font-medium text-gray-900 line-clamp-2">{blog.title}</h4>
+        <span className="text-xs text-gray-500 mt-1">
+          {new Date(blog.createdAt).toLocaleDateString()}
+        </span>
+      </div>
+    </Link>
+  );
 
   if (loading) {
     return (
@@ -91,9 +126,7 @@ const BlogGuestView = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-poppins">
       <SharedNav />
-
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8 mt-20">
+      <div className="max-w-7xl mx-auto px-4 py-8 mt-20">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -153,6 +186,27 @@ const BlogGuestView = () => {
           <div className="prose prose-blue max-w-none text-left">
             <div dangerouslySetInnerHTML={{ __html: blog.content }} />
           </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Content */}
+          <div className="flex-1">
+            {/* ... existing blog content ... */}
+          </div>
+
+          {/* Sidebar */}
+          {recentBlogs.length > 0 && (
+            <div className="lg:w-80 xl:w-96">
+              <div className="bg-white rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Posts</h3>
+                <div className="space-y-4">
+                  {recentBlogs.map((recentBlog) => (
+                    <RecentBlogCard key={recentBlog._id} blog={recentBlog} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
