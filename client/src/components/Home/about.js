@@ -17,6 +17,8 @@ import roberto from "../../assets/img/roberto.png";
 import mhark from "../../assets/img/mhark.png";
 import adrian from "../../assets/img/adrian.png";
 import christine from "../../assets/img/christine.png";
+import SharedNav from '../ui/SharedNav';
+
 const AboutPage = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -27,12 +29,12 @@ const AboutPage = () => {
   const teamMembers = [
     {
       name: "Christine Mendoza",
-      role: "Front End Developer, CuteTech",
-      bio: "Skilled Front End Developer with a passion for creating responsive, intuitive web applications, specializing in UI/UX design and modern web technologies.",
-      expertise: ["HTML", "CSS", "JavaScript", "React", "Responsive Design", "UI/UX"],
-      photo: christine,  // Assuming 'christine' is an imported image or URL
+      role: "Founder of EmpowerPWD | Front End Developer",
+      bio:  "The visionary behind EmpowerPWD, blending expertise in modern web technologies with a commitment to fostering inclusive innovation and accessibility.",
+      expertise: ["HTML", "Tailwind", "JavaScript", "React", "Inclusive Design"],
+      photo: christine, 
       icon: <Lightbulb className="w-6 h-6 text-blue-500" />
-    },
+    },,
     {
       name: "Adrian Perce",
       role: "Full Stack Developer, CuteTech",
@@ -97,44 +99,8 @@ const AboutPage = () => {
   ];
 
   return (
-    <div className="bg-white text-black min-h-screen font-poppins">
-      {/* Header - Reused from HomePage */}
-      <header className="fixed top-0 left-0 right-0 flex justify-between items-center px-8 py-4 bg-white z-50 shadow-md">
-        <div className="flex items-center">
-          <img src={logo} alt="logo" className="w-8 h-8" />
-          <span className="ml-2 text-lg font-semibold">EmpowerPWD</span>
-        </div>
-        <div className="hidden md:flex items-center space-x-8">
-          <nav className="flex space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-black font-medium">Home</Link>
-            <Link to="/about" className="text-gray-600 hover:text-black font-medium">About Us</Link>
-          </nav>
-          <Link 
-            to="/login" 
-            className="bg-[#1A2755] text-white px-6 py-2 rounded-xl hover:bg-[#3532D9] transition-colors font-medium"
-          >
-            SIGN IN
-          </Link>
-        </div>
-        <button 
-          className="md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-      </header>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t fixed top-16 left-0 right-0 z-40">
-          <nav className="flex flex-col p-4">
-            <Link to="/" className="py-2 text-gray-600 hover:text-black">Home</Link>
-            <Link to="/about" className="py-2 text-gray-600 hover:text-black">About Us</Link>
-          </nav>
-        </div>
-      )}
+    <div className="min-h-screen bg-white font-poppins">
+      <SharedNav />
 
       <main className="pt-20">
         {/* Hero Section */}

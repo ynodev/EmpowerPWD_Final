@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import logo from "../../assets/img/logo.svg";
 import { useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ArrowLeft, Clock, User, Tag } from 'lucide-react';
+import SharedNav from '../ui/SharedNav';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? 'https://empower-pwd.onrender.com/api'
@@ -60,59 +61,6 @@ const BlogGuestView = () => {
     };
   }, []);
 
-  // Mobile Menu Dropdown
-  const MobileMenu = () => (
-    <div className={`fixed inset-0 bg-white z-50 transform ${isOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out`}>
-      <div className="flex flex-col h-full">
-        <div className="flex justify-between items-center p-4 border-b">
-          <div className="flex items-center">
-            <img src={logo} alt="logo" className="w-8 h-8" />
-            <span className="ml-2 text-lg font-semibold">EmpowerPWD</span>
-          </div>
-          <button 
-            onClick={() => setIsOpen(false)}
-            className="text-gray-600 hover:text-black"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        <nav className="flex flex-col space-y-4 p-4">
-          <Link 
-            to="/" 
-            onClick={() => setIsOpen(false)} 
-            className="text-gray-700 hover:text-blue-600 font-medium text-lg"
-          >
-            Home
-          </Link>
-          <Link 
-            to="/about" 
-            onClick={() => setIsOpen(false)} 
-            className="text-gray-700 hover:text-blue-600 font-medium text-lg"
-          >
-            About Us
-          </Link>
-          <Link 
-            to="/guest/blogs" 
-            onClick={() => setIsOpen(false)} 
-            className="text-gray-700 hover:text-blue-600 font-medium text-lg"
-          >
-            Blogs
-          </Link>
-        </nav>
-        <div className="mt-auto p-4 border-t">
-          <Link 
-            to="/login" 
-            className="w-full bg-[#1A2755] text-white px-6 py-3 rounded-xl hover:bg-[#3532D9] transition-colors font-medium text-center block"
-          >
-            SIGN IN
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-poppins flex items-center justify-center">
@@ -142,37 +90,7 @@ const BlogGuestView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-poppins">
-      {/* Mobile Menu */}
-      <MobileMenu />
-
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 flex justify-between items-center px-4 md:px-8 py-4 bg-white z-40 shadow-md">
-        <div className="flex items-center">
-          <img src={logo} alt="logo" className="w-8 h-8" />
-          <span className="ml-2 text-lg font-semibold">EmpowerPWD</span>
-        </div>
-        <div className="hidden md:flex items-center space-x-8">
-          <nav className="flex space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-black font-medium">Home</Link>
-            <Link to="/about" className="text-gray-600 hover:text-black font-medium">About Us</Link>
-            <Link to="/guest/blogs" className="text-gray-600 hover:text-black font-medium">Blogs</Link>
-          </nav>
-          <Link 
-            to="/login" 
-            className="bg-[#1A2755] text-white px-6 py-2 rounded-xl hover:bg-[#3532D9] transition-colors font-medium"
-          >
-            SIGN IN
-          </Link>
-        </div>
-        <button 
-          className="md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-      </header>
+      <SharedNav />
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8 mt-20">
