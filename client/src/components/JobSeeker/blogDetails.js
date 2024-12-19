@@ -8,9 +8,36 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
     ? 'https://empower-pwd.onrender.com/api'
     : '/api';
 
+const BlogSuggestionCard = ({ blog }) => (
+  <Link to={`/blogs/${blog._id}`} className="flex gap-3 p-3 hover:bg-gray-50 rounded-lg transition-all">
+    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+      <img 
+        src={blog.thumbnail || '/default-blog-thumbnail.jpg'} 
+        alt={blog.title}
+        className="w-full h-full object-cover"
+      />
+    </div>
+    <div className="flex-1">
+      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-1
+        ${blog.type === 'Article' ? 'bg-blue-100 text-blue-700' :
+          blog.type === 'Guide' ? 'bg-green-100 text-green-700' :
+          blog.type === 'News' ? 'bg-purple-100 text-purple-700' :
+          'bg-orange-100 text-orange-700'}`}
+      >
+        {blog.type}
+      </span>
+      <h4 className="text-sm font-medium text-gray-900 line-clamp-2">{blog.title}</h4>
+      <span className="text-xs text-gray-500 mt-1">
+        {new Date(blog.createdAt).toLocaleDateString()}
+      </span>
+    </div>
+  </Link>
+);
+
 const BlogDetails = () => {
   const [blog, setBlog] = useState(null);
   const [relatedBlogs, setRelatedBlogs] = useState([]);
+  const [recentBlogs, setRecentBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -30,14 +57,26 @@ const BlogDetails = () => {
           
           // Fetch related blogs based on type
           const relatedResponse = await fetch(
-            `${API_BASE_URL}/blogs/public?type=${blogData.blog.type}&limit=3`
+            `${API_BASE_URL}/blogs/public?type=${blogData.blog.type}&limit=4`
           );
           const relatedData = await relatedResponse.json();
+          
+          // Fetch recent blogs
+          const recentResponse = await fetch(
+            `${API_BASE_URL}/blogs/public?sort=newest&limit=5`
+          );
+          const recentData = await recentResponse.json();
           
           if (relatedData.success) {
             // Filter out the current blog
             const filteredRelated = relatedData.blogs.filter(b => b._id !== id);
-            setRelatedBlogs(filteredRelated.slice(0, 3));
+            setRelatedBlogs(filteredRelated.slice(0, 4));
+          }
+          
+          if (recentData.success) {
+            // Filter out the current blog from recent blogs too
+            const filteredRecent = recentData.blogs.filter(b => b._id !== id);
+            setRecentBlogs(filteredRecent.slice(0, 5));
           }
         }
       } catch (error) {
@@ -92,7 +131,7 @@ const BlogDetails = () => {
       <NavSeeker />
       
       {/* Back Button */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <Link 
           to="/blogs" 
           className="inline-flex items-center text-gray-600 hover:text-gray-900"
@@ -102,7 +141,7 @@ const BlogDetails = () => {
         </Link>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 pb-12">
+      <div className="max-w-7xl mx-auto px-4 pb-12">
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -112,59 +151,76 @@ const BlogDetails = () => {
             <p className="text-red-500">{error}</p>
           </div>
         ) : blog ? (
-          <>
-            {/* Blog Content */}
-            <article className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              {blog.thumbnail && (
-                <div className="relative h-[300px] md:h-[400px]">
-                  <img 
-                    src={blog.thumbnail} 
-                    alt={blog.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  
-                  <div className="absolute bottom-0 left-0 right-0 p-8">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-white/10
-                        ${blog.type === 'Article' ? 'text-blue-200' :
-                          blog.type === 'Guide' ? 'text-green-200' :
-                          blog.type === 'News' ? 'text-purple-200' :
-                          'text-orange-200'}`}
-                      >
-                        {blog.type}
-                      </span>
-                      <span className="text-sm text-gray-200">
-                        {new Date(blog.createdAt).toLocaleDateString()}
-                      </span>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Main Content */}
+            <div className="flex-1">
+              <article className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                {blog.thumbnail && (
+                  <div className="relative h-[300px] md:h-[400px]">
+                    <img 
+                      src={blog.thumbnail} 
+                      alt={blog.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-8">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-white/10
+                          ${blog.type === 'Article' ? 'text-blue-200' :
+                            blog.type === 'Guide' ? 'text-green-200' :
+                            blog.type === 'News' ? 'text-purple-200' :
+                            'text-orange-200'}`}
+                        >
+                          {blog.type}
+                        </span>
+                        <span className="text-sm text-gray-200">
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <h1 className="text-3xl font-bold mb-4 text-white">{blog.title}</h1>
+                      <div className="flex items-center gap-2 text-sm text-gray-200">
+                        <span>By {blog.author}</span>
+                      </div>
                     </div>
-                    <h1 className="text-3xl font-bold mb-4 text-white">{blog.title}</h1>
-                    <div className="flex items-center gap-2 text-sm text-gray-200">
-                      <span>By {blog.author}</span>
-                    </div>
+                  </div>
+                )}
+
+                <div className="p-8">
+                  <div className="prose prose-blue max-w-none">
+                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:w-80 xl:w-96 space-y-6">
+              {/* Related Blogs Section */}
+              {relatedBlogs.length > 0 && (
+                <div className="bg-white rounded-xl p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Related Articles</h3>
+                  <div className="space-y-4">
+                    {relatedBlogs.map((relatedBlog) => (
+                      <BlogSuggestionCard key={relatedBlog._id} blog={relatedBlog} />
+                    ))}
                   </div>
                 </div>
               )}
 
-              <div className="p-8">
-                <div className="prose prose-blue max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+              {/* Recent Posts Section */}
+              {recentBlogs.length > 0 && (
+                <div className="bg-white rounded-xl p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Posts</h3>
+                  <div className="space-y-4">
+                    {recentBlogs.map((recentBlog) => (
+                      <BlogSuggestionCard key={recentBlog._id} blog={recentBlog} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </article>
-
-            {/* Related Blogs Section */}
-            {relatedBlogs.length > 0 && (
-              <div className="mt-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {relatedBlogs.map((relatedBlog) => (
-                    <BlogCard key={relatedBlog._id} blog={relatedBlog} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
+              )}
+            </div>
+          </div>
         ) : null}
       </div>
     </div>
