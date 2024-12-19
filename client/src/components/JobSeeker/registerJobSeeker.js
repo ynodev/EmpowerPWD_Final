@@ -5,6 +5,7 @@ import axios from 'axios';
 import { debounce } from 'lodash';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import logo from "../../assets/img/logo.svg"; // Add this import
 
 // Custom Components
 import NavRegister from '../ui/navRegister';
